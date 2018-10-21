@@ -1,0 +1,1 @@
+<h1>Šablona pro homepage</h1>

@@ -1,0 +1,15 @@
+Options +FollowSymlinks
+RewriteEngine On
+
+# Explicitly disable rewriting for front controllers
+RewriteRule ^index.php - [L]
+
+# rewrite na https
+# RewriteCond %{SERVER_PORT} !^443
+# RewriteRule (.*) https://domena.cz/$1 [R=301,L]
+
+# rewrite na index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.php [QSA,L]
+

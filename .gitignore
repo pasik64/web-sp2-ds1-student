@@ -1,0 +1,4 @@
+.idea/
+vendor/
+web/admin/node_modules/
+cache/

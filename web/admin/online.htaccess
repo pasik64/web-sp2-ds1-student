@@ -1,0 +1,9 @@
+Options +FollowSymlinks
+RewriteEngine On
+
+# Explicitly disable rewriting for front controllers
+RewriteRule ^index.php - [L]
+
+RewriteCond %{REQUEST_URI} ^admin
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ /admin/index.php [QSA,L]
