@@ -8,7 +8,7 @@
     define("DS1_SELECTED_CONFIGURATION", "web_student.cz_dev");
 
     // PRODUKCE
-    // define("SE3_SELECTED_CONFIGURATION", "web_student.cz_production");
+    // define("DS1_SELECTED_CONFIGURATION", "web_student.cz_production");
 
     // tohle potrebuji tady kuli volbe kontextu, ktery musi byt pred konfiguraci ready
     // definice moznych kontextu

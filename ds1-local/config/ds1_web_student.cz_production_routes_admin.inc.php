@@ -5,7 +5,7 @@
      */
 
 
-    $path = DS1_PROJECT_ROOT . DS1_DIR_SIMPLE_ESHOP3_LOCAL . "config/ds1_web_student.cz_dev_routes_admin.inc.php";
+    $path = DS1_PROJECT_ROOT . DS1_DIR_ROOT_LOCAL . "config/ds1_web_student.cz_dev_routes_admin.inc.php";
     //echo $path; exit;
 
     include($path);
