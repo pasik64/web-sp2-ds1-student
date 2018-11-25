@@ -23,6 +23,9 @@
         define("DS1_DIR_ROOT", "ds1-core/");               // hlavni repozitar
         define("DS1_DIR_ROOT_LOCAL", "ds1-local/");   // lokalni modifikace a konfigurace
 
+        // cesta k admin modules z admina
+        define("DS1_DIR_ADMIN_MODULES_FROM_ADMIN", DS1_PROJECT_ROOT_FROM_ADMIN.DS1_DIR_ROOT_LOCAL."admin_modules/");
+
         // adresar s twigem
         define("DS1_DIR_TEMPLATES_TWIG_LOCAL", DS1_PROJECT_ROOT.DS1_DIR_ROOT_LOCAL."templates_twig/");
         define("DS1_DIR_TEMPLATES_TWIG_CACHE", DS1_PROJECT_ROOT."cache/twig/");

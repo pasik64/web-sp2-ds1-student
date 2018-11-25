@@ -43,6 +43,11 @@ class obyvatele_controller extends ds1_base_controller
 
         $content = "";
 
+        // defaultni vysledek akce
+        $result_msg = "";
+        $result_ok = true;
+
+
         // AKCE - VYPISY
         if ($action == "obyvatel_detail_show") {
             /*
@@ -62,37 +67,51 @@ class obyvatele_controller extends ds1_base_controller
         }
 
         if ($action == "obyvatel_update_go") {
-            /*
-            $user_id = $this->loadRequestParam($request,"user_id", "all", -1);
-            $user = $this->ds1->user_manager->getUserById($user_id);
+            $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
+            $obyvatel_new = $this->loadRequestParam($request, "obyvatel", "post", null);
 
-            if ($user_id > 0 && $user != null) {
-                // vypis
-                $content_params["user"] = $user;
-                $content = $this->renderPhp("admin/user_manager/admin_user_detail_show.inc.php", $content_params, true);
+            if ($obyvatel_id > 0 && $obyvatel_new != null) {
+                // mohu provest update
+                //printr($obyvatel_new);
+
+                // provest update
+                $ok = $obyvatele->adminUpdateItem($obyvatel_id, $obyvatel_new);
+
+                if ($ok) {
+                    $result_ok = true;
+                    $result_msg = "Změny obyvatele byly uloženy.";
+                }
+                else {
+                    $result_ok = false;
+                    $result_msg = "Změny obyvatele se nepovedlo uložit.";
+                }
             }
-            else {
-                $result_msg = "Uživatel nenalezen - ID nebylo získáno z URL.";
-                $action = "users_list_all";
-            }
-            */
+
+            // presun do detailu
+            $action = "obyvatel_update_prepare";
         }
 
         if ($action == "obyvatel_update_prepare") {
-            /*
-            $user_id = $this->loadRequestParam($request,"user_id", "all", -1);
-            $user = $this->ds1->user_manager->getUserById($user_id);
+            $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
+            $obyvatel = $obyvatele->adminGetItemByID($obyvatel_id);
 
-            if ($user_id > 0 && $user != null) {
+            if ($obyvatel_id > 0 && $obyvatel != null) {
                 // vypis
-                $content_params["user"] = $user;
-                $content = $this->renderPhp("admin/user_manager/admin_user_detail_show.inc.php", $content_params, true);
+                // parametry pro skript s obsahem - POZOR: nesmim je vynulovat, uz mam pripravenou cast
+                $content_params["obyvatel_id"] = $obyvatel_id;
+                $content_params["obyvatel"] = $obyvatel;
+                $content_params["form_submit_url"] = $this->makeUrlByRoute($this->route);
+                $content_params["form_action_update_obyvatel"] = "obyvatel_update_go";
+                $content_params["url_obyvatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatele_list_all"));
+
+                $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatel_update_form.inc.php", $content_params, true);
             }
             else {
-                $result_msg = "Uživatel nenalezen - ID nebylo získáno z URL.";
-                $action = "users_list_all";
+                $result_msg = "Obyvatel nenalezen - ID nebylo získáno z URL nebo obyvatel neexistuje.";
+                $result_ok = false;
+
+                $action = "obyvatele_list_all";
             }
-            */
         }
 
         if ($action == "obyvatele_list_all") {
@@ -104,7 +123,7 @@ class obyvatele_controller extends ds1_base_controller
             $total = $obyvatele->adminLoadItems("count", 1, 1, $where_array);
             //echo "total: $total"; exit;
 
-            // vygenerovat strankovani - obecna metoda
+            // vygenerovat strankovani - obecna metoda,
             $pagination_params["page_number"] = $this->page_number;
             $pagination_params["count"] = $count;
             $pagination_params["total"] = $total;
@@ -113,21 +132,28 @@ class obyvatele_controller extends ds1_base_controller
             $pagination_html = $this->renderPhp("admin/partials/admin_pagination.inc.php", $pagination_params, true);
             // echo $pagination_html; exit;
 
-            // parametry pro skript s obsahem
-            $content_params["users_list_name"] = "všichni"; // dle filtru
-            $content_params["user_detail_action"] = "obyvatel_detail_show";
+            // parametry pro skript s obsahem, uz mam neco pripraveno, NESMIM NULOVAT
+            $content_params["obyvatele_list_name"] = "všichni"; // dle filtru
+            $content_params["obyvatel_detail_action"] = "obyvatel_detail_show";
+            $content_params["obyvatel_update_prepare_action"] = "obyvatel_update_prepare";
             $content_params["obyvatele_count"] = $count;
             $content_params["obyvatele_total"] = $total;
             //$content_params["search_params"] = $search_params;
-            $content_params["users_list"] = $obyvatele->adminLoadItems("data", $this->page_number, $count, $where_array, "prijmeni", "asc");
+            $content_params["obyvatele_list"] = $obyvatele->adminLoadItems("data", $this->page_number, $count, $where_array, "prijmeni", "asc");
             $content_params["pagination_html"] = $pagination_html;
 
-            $content = $this->renderPhp("../../ds1-local/admin_modules/obyvatele/templates/admin_obyvatele_list.inc.php", $content_params, true);
+            // vysledek nejake akce
+            $content_params["result_msg"] = $result_msg;
+            $content_params["result_ok"] = $result_ok;
+
+            $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatele_list.inc.php", $content_params, true);
         }
 
         // vypsat hlavni template
         $main_params = array();
         $main_params["content"] = $content;
+        $main_params["result_msg"] = $result_msg;
+        $main_params["result_ok"] = $result_ok;
 
         return $this->renderAdminTemplate($main_params);
         //return new Response("Controller pro obyvatele.");
