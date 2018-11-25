@@ -1,4 +1,4 @@
-<div class="container-fluid" data-ng-controller="adminGoodsDetailController">
+<div class="container-fluid">
 
     <form method="post" action="<?php echo $form_submit_url; ?>">
         <input type="hidden" name="action" value="<?php echo $form_action_update_obyvatel; ?>"/>
@@ -19,11 +19,36 @@
                             $text_columns = array();
                             $text_columns["jmeno"] = "Jméno";
                             $text_columns["prijmeni"] = "Příjmení";
+                            $text_columns["rodne_prijmeni"] = "Rodné příjmení";
+
+                            $text_columns["datum_narozeni"] = "Datum narození";
+                            $text_columns["tituly_pred"] = "Tituly před";
+                            $text_columns["rodne_cislo"] = "Rodné číslo";
+                            $text_columns["misto_narozeni"] = "Místo narození";
+
+                            $text_columns["pojistovna_zkratka"] = "Pojišťovna zkratka";
+                            $text_columns["cislo_pojistence"] = "Číslo pojištěnce";
+
+                            $text_columns["adresa_ulice"] = "Adresa - ulice";
+                            $text_columns["adresa_cp"] = "Adresa - čp";
+                            $text_columns["adresa_mesto"] = "Adresa - město";
+                            $text_columns["op"] = "OP";
+                            $text_columns["op_platnost_do"] = "OP platnost do";
+
+                            // definice, ktera pole jsou datumy
+                            $dates_text_columns_keys = array();
+                            $dates_text_columns_keys[] = "datum_narozeni";
+                            $dates_text_columns_keys[] = "op_platnost_do";
 
                             // tridy pro konkretni polozky
                             $classes_for_columns = array();
                             //$classes_for_columns["prijmeni"] = array("tr" => "table-success");
 
+
+                            // napoveda pro vse
+                            $input_help_desc = array();
+                            $input_help_desc["rodne_cislo"] = "Rodné číslo ukládáme textově. Klidně s lomítkem.";
+                            $input_help_desc["pojistovna_zkratka"] = "Např. VZP. Zkratku je potřeba ukládat stále stejně.";
 
                             // popisy
                             $textarea_columns = array();
@@ -56,7 +81,7 @@
                                 */
 
 
-                                // zakladni texty
+                                // zakladni texty vcetne datumu
                                 foreach ($text_columns as $key => $value) {
 
                                     // tridy
@@ -70,10 +95,24 @@
                                     // konec tridy
 
                                     echo "<tr $tr_class_pom>";
-                                    echo "<th class='w-25'>$value</th>";
-                                    echo "<td class='w-75'>
-                                                <input type=\"text\" class=\"form-control\" name=\"obyvatel[$key]\" value=\"".$obyvatel[$key]."\" />
-                                                </td>";
+                                            echo "<th class='w-30'>$value</th>";
+                                            echo "<td class='w-40'>";
+
+                                                $input_type = "text";
+                                                if (in_array($key, $dates_text_columns_keys)) {
+                                                    // je to datum
+                                                    $input_type = "date";
+                                                }
+
+                                                echo "<input type=\"$input_type\" class=\"form-control\" name=\"obyvatel[$key]\" value=\"".$obyvatel[$key]."\" />";
+                                            echo "</td>";
+                                            echo "<td class='w-30'>";
+                                                // napoveda
+                                                if (array_key_exists($key, $input_help_desc)) {
+                                                    // vypsat napovedu
+                                                    echo $input_help_desc[$key];
+                                                }
+                                            echo "</td>";
                                     echo "</tr>";
                                 }
 

@@ -20,6 +20,36 @@ class obyvatele extends \ds1\core\ds1_base_model
         return $this->DBExistsItemByID(TABLE_OBYVATELE, $id);
     }
 
+    /**
+     * Test existence obyvatele specialne pro pridavani noveho obyvatele.
+     *
+     * @param $params - pole hodnot pro hledani
+     * @return bool
+     */
+    public function adminExistsObyvatelByParams($obyvatel) {
+        $table_name = TABLE_OBYVATELE;
+
+        $where_array = array();
+
+        // prihodit tam vsechny podminky
+        if ($obyvatel != null){
+            foreach ($obyvatel as $key => $value) {
+                $where_array[] = $this->DBHelperGetWhereItem("$key", $obyvatel[$key]);
+            }
+
+            $limit_pom = "limit 1";
+            $row = $this->DBSelectOne($table_name, "*", $where_array, $limit_pom);
+            //echo "obyv by params";
+            //printr($row);
+
+            if ($row != null)
+                return true;
+            else
+                return false;
+        }
+
+        return null;
+    }
 
     public function adminGetItemByID($id) {
         $id += 0;

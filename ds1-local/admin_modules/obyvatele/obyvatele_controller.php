@@ -40,6 +40,7 @@ class obyvatele_controller extends ds1_base_controller
         $content_params["page_number"] = $this->page_number;
         $content_params["route"] = $this->route;        // mam tam orders, je to automaticky z routingu
         $content_params["route_params"] = array();
+        $content_params["controller"] = $this;
 
         $content = "";
 
@@ -49,22 +50,46 @@ class obyvatele_controller extends ds1_base_controller
 
 
         // AKCE - VYPISY
-        if ($action == "obyvatel_detail_show") {
-            /*
-            $user_id = $this->loadRequestParam($request,"user_id", "all", -1);
-            $user = $this->ds1->user_manager->getUserById($user_id);
 
-            if ($user_id > 0 && $user != null) {
-                // vypis
-                $content_params["user"] = $user;
-                $content = $this->renderPhp("admin/user_manager/admin_user_detail_show.inc.php", $content_params, true);
+        // opravdu vytvorit obyvatele
+        if ($action == "obyvatel_add_go") {
+            // nacist data
+            $obyvatel_new = $this->loadRequestParam($request, "obyvatel", "post", null);
+            //printr($obyvatel_new);
+
+            // FIXME mozna casem kontrola, jestli mam datum ve spravnem formatu - spoleham na prohlizec
+            // datum_narozeni
+
+            // kontrola, jestli obyvatel s temito daty - napr. jmenem, prijmenim a datem narozeni uz neexistuje
+            $existuje = $obyvatele->adminExistsObyvatelByParams($obyvatel_new);
+
+            // pokud neexistuje, tak pridat
+            if ($existuje == false) {
+                // mohu pridat
+                $obyvatel_id = $obyvatele->adminInsertItem($obyvatel_new);
+
+                // prepnout na editaci obyvatele
+                $action = "obyvatel_update_prepare";
             }
             else {
-                $result_msg = "Uživatel nenalezen - ID nebylo získáno z URL.";
+                // FIXME pokud existuje, tak dotaz s odkazem na action2 = add_force
+                // zatim chyba, ze uz existuje
+                $result_ok = false;
+                $result_msg = "Tento obyvatel již existuje. Nemohu ho přidat.";
                 $action = "obyvatele_list_all";
             }
-            */
         }
+
+        // formular pro vytvoreni noveho obyvatele
+        if ($action == "obyvatel_add_prepare") {
+            // parametry pro skript s obsahem - POZOR: nesmim je vynulovat, uz mam pripravenou cast
+            $content_params["form_submit_url"] = $this->makeUrlByRoute($this->route);
+            $content_params["form_action_insert_obyvatel"] = "obyvatel_add_go";
+            $content_params["url_obyvatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatele_list_all"));
+
+            $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatel_insert_form.inc.php", $content_params, true);
+        }
+
 
         if ($action == "obyvatel_update_go") {
             $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
@@ -88,11 +113,17 @@ class obyvatele_controller extends ds1_base_controller
             }
 
             // presun do detailu
-            $action = "obyvatel_update_prepare";
+            $action = "obyvatel_detail_show";
         }
 
         if ($action == "obyvatel_update_prepare") {
-            $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
+
+            if (!isset($obyvatel_id)) {
+                // pokud nemam obyvatele, tak nactu z URL. Jinak uz ho MAM treba z INSERTu
+                $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
+            }
+
+            // nacist obyvatele
             $obyvatel = $obyvatele->adminGetItemByID($obyvatel_id);
 
             if ($obyvatel_id > 0 && $obyvatel != null) {
@@ -105,6 +136,37 @@ class obyvatele_controller extends ds1_base_controller
                 $content_params["url_obyvatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatele_list_all"));
 
                 $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatel_update_form.inc.php", $content_params, true);
+            }
+            else {
+                $result_msg = "Obyvatel nenalezen - ID nebylo získáno z URL nebo obyvatel neexistuje.";
+                $result_ok = false;
+
+                $action = "obyvatele_list_all";
+            }
+        }
+
+
+        // DETAIL OBYVATELE
+        if ($action == "obyvatel_detail_show") {
+            if (!isset($obyvatel_id)) {
+                // pokud nemam obyvatele, tak nactu z URL. Jinak uz ho MAM treba z INSERTu
+                $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
+            }
+
+            // nacist obyvatele
+            $obyvatel = $obyvatele->adminGetItemByID($obyvatel_id);
+
+            if ($obyvatel_id > 0 && $obyvatel != null) {
+                // vypis
+                // parametry pro skript s obsahem - POZOR: nesmim je vynulovat, uz mam pripravenou cast
+                $content_params["obyvatel_id"] = $obyvatel_id;
+                $content_params["obyvatel"] = $obyvatel;
+                //$content_params["form_submit_url"] = $this->makeUrlByRoute($this->route);
+                //$content_params["form_action_update_obyvatel"] = "obyvatel_update_go";
+                $content_params["url_obyvatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatele_list_all"));
+                $content_params["url_obyvatel_update"]  = $this->makeUrlByRoute($this->route, array("action" => "obyvatel_update_prepare", "obyvatel_id" => $obyvatel_id));
+
+                $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatel_detail.inc.php", $content_params, true);
             }
             else {
                 $result_msg = "Obyvatel nenalezen - ID nebylo získáno z URL nebo obyvatel neexistuje.";
@@ -141,6 +203,9 @@ class obyvatele_controller extends ds1_base_controller
             //$content_params["search_params"] = $search_params;
             $content_params["obyvatele_list"] = $obyvatele->adminLoadItems("data", $this->page_number, $count, $where_array, "prijmeni", "asc");
             $content_params["pagination_html"] = $pagination_html;
+
+            // url pro vytvoreni obyvatele
+            $content_params["url_obyvatel_add_prepare"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatel_add_prepare"));
 
             // vysledek nejake akce
             $content_params["result_msg"] = $result_msg;

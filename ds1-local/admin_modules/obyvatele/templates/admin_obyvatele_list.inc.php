@@ -1,12 +1,18 @@
 <div class="container-fluid">
     <div class="card">
         <div class="card-header">
-            Seznam obyvatel - <?php echo $obyvatele_list_name; ?>
+            <div class="pull-left">
+                Seznam obyvatel - <?php echo $obyvatele_list_name; ?>
+            </div>
+            <div class="pull-right">
+                <!-- odkaz pro pridani obyvatele -->
+                <a href="<?php echo $url_obyvatel_add_prepare;?>" class="btn btn-primary btn-sm"><i class="icon-plus"></i> Přidat obyvatele</a>
+            </div>
         </div>
         <div class="card-body">
 
             <?php
-
+            // vypis obyvatel
             if ($obyvatele_list != null) {
                 //printr($users_list); exit;
 
@@ -16,6 +22,9 @@
                                     <th>#</th>
                                     <th>příjmení</th>
                                     <th>jméno</th>
+                                    <th>datum narození</th>
+                                    <th>zkratka pojišťovny</th>
+                                    <th>OP platnost DO</th>
                                     <th>&nbsp;</th>
                                 </tr>";
 
@@ -37,6 +46,11 @@
                     echo "<td>$obyvatel[id]</td>";
                     echo "<td>$obyvatel[prijmeni]</td>";
                     echo "<td>$obyvatel[jmeno]</td>";
+
+                    // toto mi prevede datum do spravneho formatu pro CR
+                    echo "<td>".$controller->helperFormatDate($obyvatel["datum_narozeni"])."</td>";
+                    echo "<td>$obyvatel[pojistovna_zkratka]</td>";
+                    echo "<td>".$controller->helperFormatDate($obyvatel["op_platnost_do"])."</td>";
                     echo "<td>
                                   <a href=\"$url_detail\" class='btn btn-primary btn-sm'><i class=\"icon-layers\"></i></a>
                                   &nbsp;&nbsp;
