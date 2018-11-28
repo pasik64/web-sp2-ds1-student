@@ -69,6 +69,7 @@
 
         // pokoje
         define("TABLE_POKOJE", TABLE_PREFIX."pokoje");
+        define("TABLE_SKUPINY_POKOJU", TABLE_PREFIX."skupiny_pokoju");
 
         // NAZVY SLOUPCU V DB, pokud jsou treba
         define("TABLE_USER_COLUMN_PASSWORD_BCRYPT", "password_bcrypt");

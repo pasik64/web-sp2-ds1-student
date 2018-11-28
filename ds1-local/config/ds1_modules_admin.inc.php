@@ -19,7 +19,22 @@
     // **************   KONEC Modul obyvatele          ************************************
     // ************************************************************************************
 
+    // ************************************************************************************
+    // **************   Modul pokoje        ***********************************************
 
+    // novy modul
+    $module = array();
+    $module["name"] = "pokoje";
+    $module["title"] = "Pokoje";
+    $module["route_name"] = "pokoje";
+    $module["route_path"] = "/plugin/$module[name]";
+    $module["route"] = array("controller_name" => "pokoje_controller", "controller_action" => "indexAction");
+
+    // pridat modul
+    $modules_admin[] = $module;
+
+    // **************   KONEC Modul pokoje         ****************************************
+    // ************************************************************************************
 
 
     return $modules_admin;

@@ -135,6 +135,27 @@ class pokoje extends \ds1\core\ds1_base_model
         }
     }
 
+    public function loadAllSkupinyPokoju($use_id_as_key = false) {
+        $where_array = array();
+        $order_by = array();
+
+        $items = $this->DBSelectAll(TABLE_SKUPINY_POKOJU, "*", $where_array, "", $order_by);
+        //printr($items);
+
+        if ($use_id_as_key) {
+            $pom = $items;
+            $items = array();
+
+            if ($pom != null)
+                foreach ($pom as $item) {
+                    $items[$item["id"]] = $item["nazev"];
+                }
+        }
+
+        return $items;
+    }
+
+
     // ************************************************************************************
     // *********   KONEC ADMIN     ********************************************************
     // ************************************************************************************
