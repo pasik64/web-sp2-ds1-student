@@ -61,8 +61,14 @@
         // NAZVY TABULEK - DS1
         define("TABLE_PREFIX", "ds1_");
 
+        // uzivatele, kteri pracuji s aplikaci
         define("TABLE_USERS_ADMIN", TABLE_PREFIX."uzivatele");
 
+        // obyvatele = pacienti
+        define("TABLE_OBYVATELE", TABLE_PREFIX."obyvatele");
+
+        // pokoje
+        define("TABLE_POKOJE", TABLE_PREFIX."pokoje");
 
         // NAZVY SLOUPCU V DB, pokud jsou treba
         define("TABLE_USER_COLUMN_PASSWORD_BCRYPT", "password_bcrypt");

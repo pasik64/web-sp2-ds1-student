@@ -12,7 +12,7 @@ class obyvatele extends \ds1\core\ds1_base_model
 
 
     /**
-     * Existuje polozka dle ID? Pozor: kontrola pouze existence ID. Nebere se v uvahu VIDITELNOST zbozi.
+     * Existuje polozka dle ID? Pozor: kontrola pouze existence ID. Nebere se v uvahu VIDITELNOST.
      * @param $id
      * @return bool
      */
@@ -85,7 +85,6 @@ class obyvatele extends \ds1\core\ds1_base_model
      * @param string $type - data nebo count
      * @param int $page
      * @param int $count_on_page
-     * @param array $search_params_sql - primo do tvaru pro sql
      * @param string $order_by
      * @return mixed
      */
@@ -104,7 +103,6 @@ class obyvatele extends \ds1\core\ds1_base_model
         }
 
         $table_name = TABLE_OBYVATELE;
-        $count_on_page += 0;
         $order_by = $this->DBHelperFixColumnName($order_by);
 
         $order_by_pom = array();

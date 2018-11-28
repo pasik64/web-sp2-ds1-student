@@ -7,10 +7,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 use ds1\core\ds1_base_controller;
 
-// TODO konstaty presunout do konfigurace
-define("TABLE_OBYVATELE", "ds1_obyvatele");
-
-
 class obyvatele_controller extends ds1_base_controller
 {
     // timto rikam, ze je NUTNE PRIHLASENI ADMINA
