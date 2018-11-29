@@ -91,7 +91,39 @@
         <!-- konec panel ZAKLAD  -->
 
         <!-- start panel OBYVATELE na pokoji  -->
-        <div class="tab-pane fade" id="obyvatele" role="tabpanel" aria-labelledby="obyvatele-tab">Obyvatelé na pokoji</div>
+        <div class="tab-pane fade" id="obyvatele" role="tabpanel" aria-labelledby="obyvatele-tab">
+            <h2>Obyvatelé na pokoji</h2>
+
+            <?php
+            //printr($obyvatele_na_pokoji);
+
+            if ($obyvatele_na_pokoji != null){
+                echo "<table class='table table-sm table-striped table-bordered'>";
+                echo "<tr><th>Datum od</th><th>Datum do</th><th>Jméno a příjmení (datum narození)</th></tr>";
+
+                foreach ($obyvatele_na_pokoji as $ubytovani) {
+
+                    // url na detail obyvatele
+                    $url_obyvatel_detail = $controller->makeUrlByRoute($obyvatele_route_name,
+                        array("action" => "obyvatel_detail_show", "obyvatel_id" => $ubytovani["obyvatel_id"])
+                    );
+
+                    echo "<tr>";
+                    // toto bude navic datetime
+                    echo "<td>".$controller->helperFormatDateAuto($ubytovani["datum_od"])."</td>";
+                    echo "<td>".$controller->helperFormatDateAuto($ubytovani["datum_do"])."</td>";
+                    echo "<td><a href='$url_obyvatel_detail'>"
+                                .$ubytovani["obyvatel"]["jmeno"] ." "
+                                .$ubytovani["obyvatel"]["prijmeni"] ." "
+                                ."(".$controller->helperFormatDateAuto($ubytovani["obyvatel"]["datum_narozeni"]).")"
+                            ."</a></td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+            }
+
+            ?>
+        </div>
         <!-- konec panel UBYTOVANI   -->
     </div>
     <!-- konec panely pro zalozky  -->

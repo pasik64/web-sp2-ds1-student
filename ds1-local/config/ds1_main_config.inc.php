@@ -67,6 +67,9 @@
         // obyvatele = pacienti
         define("TABLE_OBYVATELE", TABLE_PREFIX."obyvatele");
 
+        // obyvatele na pokojich
+        define("TABLE_OBYVATELE_NA_POKOJICH", TABLE_PREFIX."obyvatele_na_pokojich");
+
         // pokoje
         define("TABLE_POKOJE", TABLE_PREFIX."pokoje");
         define("TABLE_SKUPINY_POKOJU", TABLE_PREFIX."skupiny_pokoju");

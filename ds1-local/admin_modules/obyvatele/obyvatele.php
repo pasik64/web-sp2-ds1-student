@@ -3,6 +3,8 @@
 namespace ds1\admin_modules\obyvatele;
 
 
+use ds1\admin_modules\pokoje\pokoje;
+
 class obyvatele extends \ds1\core\ds1_base_model
 {
 
@@ -234,6 +236,73 @@ class obyvatele extends \ds1\core\ds1_base_model
         return $this->DBSelectAll($table_name, "*", array(), "");
     }
 */
+
+
+    // *****************  UBYTOVANI ***********************
+    /**
+     * Vytahne data z tabulky obyvatele_na_pokojich
+     * TODO u teto metody by sel zvednout vykon, pokud by bylo treba
+     */
+    public function adminLoadAllUbytovaniObyvatelu($obyvatel_id, $pokoj_id = -1) {
+        $obyvatel_id += 0;
+        $pokoj_id += 0;
+
+        // vytvorit pomocny objekt pro praci s pokoji
+        // staci mi to lokalne, globalne to zatim nepotrebuji
+        $pokoje = new pokoje($this->GetPDOConnection());
+
+        $table_name = TABLE_OBYVATELE_NA_POKOJICH;
+
+        // razeni
+        $order_by_pom = array();
+        $order_by_pom[] = array("column" => "datum_od", "sort" => "desc");
+
+        // podminka
+        $where_array = array();
+
+        // podminka na obyvatele, pokud je
+        if ($obyvatel_id > 0){
+            $where_array[] = $this->DBHelperGetWhereItem("obyvatel_id", $obyvatel_id);
+        }
+
+        // podminka na pokoj, pokud je
+        if ($pokoj_id > 0){
+            $where_array[] = $this->DBHelperGetWhereItem("pokoj_id", $pokoj_id);
+        }
+
+        // bez limitu na pocet
+        $limit_pom = "";
+
+        $rows = $this->DBSelectAll($table_name, "*", $where_array, $limit_pom, $order_by_pom);
+        //printr($rows);
+
+        // projit zaznamy a doplnit informace o pokojich a obyvatelich FIXME - sla by zvysit vykonnost
+        if ($rows != null) {
+            foreach ($rows as $rows_index => $row){
+                //printr($row);
+
+                // pridat info o pokoji
+                $pokoj_detail = $pokoje->adminGetItemByID($row["pokoj_id"]);
+                //printr($pokoj_detail);
+
+                $rows[$rows_index]["pokoj"] = $pokoj_detail;
+                $rows[$rows_index]["pokoj_nazev"] = $pokoj_detail["nazev"];
+                $rows[$rows_index]["pokoj_poschodi"] = $pokoj_detail["poschodi"];
+
+                // pridat info o obyvateli
+                $obyvatel_detail = $this->adminGetItemByID($row["obyvatel_id"]);
+                //printr($obyvatel_detail);
+                $rows[$rows_index]["obyvatel"] = $obyvatel_detail;
+            }
+        }
+
+        return $rows;
+    }
+
+
+
+
+
 
     // ************************************************************************************
     // *********   KONEC ADMIN     ********************************************************

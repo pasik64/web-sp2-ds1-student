@@ -2,6 +2,7 @@
 
 namespace ds1\admin_modules\pokoje;
 
+use ds1\admin_modules\obyvatele\obyvatele;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -25,6 +26,9 @@ class pokoje_controller extends ds1_base_controller
         // objekt pro praci s obyvateli
         $pokoje = new pokoje();
         $pokoje->SetPDOConnection($this->ds1->GetPDOConnection());
+
+        // objekt obyvatelu
+        $obyvatele = new obyvatele($this->ds1->GetPDOConnection());
 
         // AKCE
         // action - typ akce
@@ -159,6 +163,10 @@ class pokoje_controller extends ds1_base_controller
                 //$content_params["form_action_update_obyvatel"] = "obyvatel_update_go";
                 $content_params["url_pokoje_list"] = $this->makeUrlByRoute($this->route, array("action" => "pokoje_list_all"));
                 $content_params["url_pokoj_update"]  = $this->makeUrlByRoute($this->route, array("action" => "pokoj_update_prepare", "pokoj_id" => $pokoj_id));
+
+                // obyvatele na pokoji
+                $content_params["obyvatele_route_name"] = "obyvatele";
+                $content_params["obyvatele_na_pokoji"] = $obyvatele->adminLoadAllUbytovaniObyvatelu(-1, $pokoj_id);
 
                 $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "pokoje/templates/admin_pokoj_detail.inc.php", $content_params, true);
             }

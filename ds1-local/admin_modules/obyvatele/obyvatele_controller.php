@@ -157,10 +157,17 @@ class obyvatele_controller extends ds1_base_controller
                 // parametry pro skript s obsahem - POZOR: nesmim je vynulovat, uz mam pripravenou cast
                 $content_params["obyvatel_id"] = $obyvatel_id;
                 $content_params["obyvatel"] = $obyvatel;
+
+                // ubytovani obyvatele
+                $content_params["obyvatel_na_pokojich"] = $obyvatele->adminLoadAllUbytovaniObyvatelu($obyvatel_id);
+
                 //$content_params["form_submit_url"] = $this->makeUrlByRoute($this->route);
                 //$content_params["form_action_update_obyvatel"] = "obyvatel_update_go";
                 $content_params["url_obyvatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatele_list_all"));
                 $content_params["url_obyvatel_update"]  = $this->makeUrlByRoute($this->route, array("action" => "obyvatel_update_prepare", "obyvatel_id" => $obyvatel_id));
+
+                // FIXME - casem nejak predavat jmena externich rout
+                $content_params["pokoje_route_name"] = "pokoje";
 
                 $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatel_detail.inc.php", $content_params, true);
             }
