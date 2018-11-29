@@ -239,6 +239,49 @@ class obyvatele extends \ds1\core\ds1_base_model
 
 
     // *****************  UBYTOVANI ***********************
+
+    public function adminInsertUbytovaniObyvatele($item) {
+        //printr($item);
+
+        if (!isset($item["obyvatel_id"])) {
+            return false;
+        } else {
+            $item["obyvatel_id"] += 0;
+        }
+
+        // pokud neni datum do zadan, tak vyhodim, aby bylo null
+        if (trim($item["datum_do"]) == "") {
+            unset($item["datum_do"]);
+        }
+
+        $id = $this->DBInsert(TABLE_OBYVATELE_NA_POKOJICH, $item);
+        return $id;
+    }
+
+    /**
+     * @param $id - id v tabulce obyvatele_na_pokojich
+     * @param $obyvatel_id
+     * @return bool
+     */
+    public function adminDeleteUbytovaniObyvatele($id, $obyvatel_id) {
+        $id += 0;
+        $obyvatel_id += 0;
+
+        if ($id > 0 && $obyvatel_id > 0) {
+            // mohu smazat
+            $where_array = array();
+            $where_array[] = $this->DBHelperGetWhereItem("id", $id);
+            $where_array[] = $this->DBHelperGetWhereItem("obyvatel_id", $obyvatel_id);
+
+            $limit_pom = "limit 1";
+
+            $ok = $this->DBDelete(TABLE_OBYVATELE_NA_POKOJICH, $where_array, $limit_pom);
+            return $ok;
+        }
+        else
+            return false;
+    }
+
     /**
      * Vytahne data z tabulky obyvatele_na_pokojich
      * TODO u teto metody by sel zvednout vykon, pokud by bylo treba

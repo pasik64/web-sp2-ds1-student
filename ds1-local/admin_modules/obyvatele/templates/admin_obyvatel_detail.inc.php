@@ -140,6 +140,11 @@
                 }
 
             ?>
+
+            <div>
+                <!-- odkaz pro pridani obyvatele do pokoje -->
+                <a href="<?php echo $url_obyvatele_na_pokoje_add_prepare;?>" class="btn btn-primary btn-sm"><i class="icon-pencil"></i> Změnit ubytování</a>
+            </div>
         </div>
         <!-- konec panel UBYTOVANI   -->
 

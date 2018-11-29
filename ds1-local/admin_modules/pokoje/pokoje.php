@@ -96,7 +96,7 @@ class pokoje extends \ds1\core\ds1_base_model
      *
      * @param string $type - data nebo count
      * @param int $page
-     * @param int $count_on_page
+     * @param int $count_on_page = -1 = vse
      * @param string $order_by
      * @return mixed
      */
@@ -108,7 +108,15 @@ class pokoje extends \ds1\core\ds1_base_model
 
             if ($page <= 1) $page = 1;
             $from = ($page - 1) * $count_on_page + 0;
-            $limit_pom = "limit $from, $count_on_page";
+
+            if ($count_on_page > 0) {
+                $limit_pom = "limit $from, $count_on_page";
+            }
+            else {
+                // limit se nepouzije, chci vsechno
+                $limit_pom = "";
+            }
+
         } else {
             $columns = "count(*)";
             $limit_pom = "";

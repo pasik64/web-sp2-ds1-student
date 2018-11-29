@@ -121,7 +121,6 @@
                 }
                 echo "</table>";
             }
-
             ?>
         </div>
         <!-- konec panel UBYTOVANI   -->

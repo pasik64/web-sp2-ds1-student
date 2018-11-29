@@ -1,6 +1,7 @@
 <?php
 namespace ds1\admin_modules\obyvatele;
 
+use ds1\admin_modules\pokoje\pokoje;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -30,6 +31,12 @@ class obyvatele_controller extends ds1_base_controller
         $action = $this->loadRequestParam($request,"action", "all", "obyvatele_list_all");
         //echo "action: ".$action;
 
+        // nacist obyvatele, pokud mam
+        $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
+        if ($obyvatel_id > 0) {
+            $obyvatel = $obyvatele->adminGetItemByID($obyvatel_id);
+        }
+
         // univerzalni content params
         $content_params = array();
         $content_params["base_url_link"] = $this->webGetBaseUrlLink();
@@ -37,6 +44,10 @@ class obyvatele_controller extends ds1_base_controller
         $content_params["route"] = $this->route;        // mam tam orders, je to automaticky z routingu
         $content_params["route_params"] = array();
         $content_params["controller"] = $this;
+
+        // JMENA EXTERNICH ROUT
+        $content_params["pokoje_route_name"] = "pokoje";
+
 
         $content = "";
 
@@ -88,7 +99,6 @@ class obyvatele_controller extends ds1_base_controller
 
 
         if ($action == "obyvatel_update_go") {
-            $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
             $obyvatel_new = $this->loadRequestParam($request, "obyvatel", "post", null);
 
             if ($obyvatel_id > 0 && $obyvatel_new != null) {
@@ -119,9 +129,6 @@ class obyvatele_controller extends ds1_base_controller
                 $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
             }
 
-            // nacist obyvatele
-            $obyvatel = $obyvatele->adminGetItemByID($obyvatel_id);
-
             if ($obyvatel_id > 0 && $obyvatel != null) {
                 // vypis
                 // parametry pro skript s obsahem - POZOR: nesmim je vynulovat, uz mam pripravenou cast
@@ -142,6 +149,92 @@ class obyvatele_controller extends ds1_base_controller
         }
 
 
+        // pridani obyvatele na pokoj - GO
+        if ($action == "obyvatel_na_pokoje_add_go") {
+
+            // data noveho zaznamu
+            $obyvatel_na_pokojich = $this->loadRequestParam($request,"obyvatel", "all", null);
+            //printr($obyvatel_na_pokojich);
+
+            if ($obyvatel_na_pokojich != null) {
+                // FIXME mozna nejake kontroly
+
+                // provest insert
+                $pom_id = $obyvatele->adminInsertUbytovaniObyvatele($obyvatel_na_pokojich);
+                if ($pom_id > 0) {
+                    $result_ok = true;
+                    $result_msg = "Změny obyvatele byly uloženy.";
+                }
+                else {
+                    $result_ok = false;
+                    $result_msg = "Změny obyvatele se nepovedlo uložit.";
+                }
+            }
+
+            // zobrazit aktualni stav
+            $action = "obyvatel_na_pokoje_add_prepare";
+        }
+
+        if ($action == "obyvatel_na_pokoje_delete_go") {
+            $obyvatel_na_pokoji_id = $this->loadRequestParam($request,"obyvatel_na_pokoji_id", "all", -1);
+
+            // FIXME, je treba pridat historii s moznosti vratit se zpet
+
+            if ($obyvatel_id > 0 && $obyvatel_na_pokoji_id > 0) {
+                // nacist a ulozit
+
+                // smazat a vypsat hlasku FIXME - do hlasky vlozit primo insert pro vlozeni zpet
+                $ok = $obyvatele->adminDeleteUbytovaniObyvatele($obyvatel_na_pokoji_id, $obyvatel_id);
+
+                if ($ok) {
+                    $result_ok = true;
+                    $result_msg = "Záznam o ubytování byl smazán.";
+                }
+                else {
+                    $result_ok = false;
+                    $result_msg = "Záznam o ubytování se nepodařilo smazat.";
+                }
+            }
+
+            // zobrazit detail obyvatele na pokoji
+            $action = "obyvatel_na_pokoje_add_prepare";
+        }
+
+
+        // Pridani obyvatele na POKOJ - PREPARE
+        if ($action == "obyvatel_na_pokoje_add_prepare") {
+            if (!isset($obyvatel_id)) {
+                // pokud nemam obyvatele, tak nactu z URL. Jinak uz ho MAM treba z INSERTu
+                $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
+            }
+
+            // form pro pridani ubytovani
+            if ($obyvatel_id > 0 && $obyvatel != null) {
+                $content_params["obyvatel_id"] = $obyvatel_id;
+                $content_params["obyvatel"] = $obyvatel;
+                $content_params["form_submit_url"] = $this->makeUrlByRoute($this->route);
+                $content_params["form_action"] = "obyvatel_na_pokoje_add_go";
+                $content_params["url_obyvatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatele_list_all"));
+                $content_params["url_obyvatel_detail"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatel_detail_show", "obyvatel_id" => $obyvatel_id));
+
+                // seznam vsech pokoju
+                $pokoje = new pokoje($this->ds1->GetPDOConnection());
+                $content_params["pokoje_list"] = $pokoje->adminLoadItems("data", 1, -1);
+
+                // info o aktualnim stavu:
+                $content_params["obyvatel_na_pokojich"] = $obyvatele->adminLoadAllUbytovaniObyvatelu($obyvatel_id);
+
+                $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatel_na_pokojich_insert_form.inc.php", $content_params, true);
+
+            }
+            else {
+                $result_msg = "Obyvatel nenalezen - ID nebylo získáno z URL nebo obyvatel neexistuje.";
+                $result_ok = false;
+
+                $action = "obyvatele_list_all";
+            }
+        }
+
         // DETAIL OBYVATELE
         if ($action == "obyvatel_detail_show") {
             if (!isset($obyvatel_id)) {
@@ -160,14 +253,12 @@ class obyvatele_controller extends ds1_base_controller
 
                 // ubytovani obyvatele
                 $content_params["obyvatel_na_pokojich"] = $obyvatele->adminLoadAllUbytovaniObyvatelu($obyvatel_id);
+                $content_params["url_obyvatele_na_pokoje_add_prepare"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatel_na_pokoje_add_prepare", "obyvatel_id" => $obyvatel_id));
 
                 //$content_params["form_submit_url"] = $this->makeUrlByRoute($this->route);
                 //$content_params["form_action_update_obyvatel"] = "obyvatel_update_go";
                 $content_params["url_obyvatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatele_list_all"));
                 $content_params["url_obyvatel_update"]  = $this->makeUrlByRoute($this->route, array("action" => "obyvatel_update_prepare", "obyvatel_id" => $obyvatel_id));
-
-                // FIXME - casem nejak predavat jmena externich rout
-                $content_params["pokoje_route_name"] = "pokoje";
 
                 $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatel_detail.inc.php", $content_params, true);
             }
