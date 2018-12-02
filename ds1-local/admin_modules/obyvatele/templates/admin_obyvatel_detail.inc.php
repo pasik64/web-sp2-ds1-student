@@ -102,7 +102,7 @@
             <div class="row">
                                 <div class="col-md-12">
                                     <div class="pull-left">
-                                        <a href="<?php echo $url_obyvatel_update;?>" class="btn btn-primary">Upravit</a>
+                                        <a href="<?php echo $url_obyvatel_update;?>" class="btn btn-primary btn-sm"><i class="icon-pencil"></i> Upravit</a>
                                     </div>
                                 </div>
             </div>

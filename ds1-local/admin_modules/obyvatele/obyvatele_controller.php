@@ -31,6 +31,9 @@ class obyvatele_controller extends ds1_base_controller
         $action = $this->loadRequestParam($request,"action", "all", "obyvatele_list_all");
         //echo "action: ".$action;
 
+        // vyhledavaci string nemam
+        $search_string = $this->loadRequestParam($request,"search_string", "all", "");
+
         // nacist obyvatele, pokud mam
         $obyvatel_id = $this->loadRequestParam($request,"obyvatel_id", "all", -1);
         if ($obyvatel_id > 0) {
@@ -39,6 +42,7 @@ class obyvatele_controller extends ds1_base_controller
 
         // univerzalni content params
         $content_params = array();
+        $content_params["base_url"] = $this->webGetBaseUrl();
         $content_params["base_url_link"] = $this->webGetBaseUrlLink();
         $content_params["page_number"] = $this->page_number;
         $content_params["route"] = $this->route;        // mam tam orders, je to automaticky z routingu
@@ -270,21 +274,39 @@ class obyvatele_controller extends ds1_base_controller
             }
         }
 
-        if ($action == "obyvatele_list_all") {
-            // vypsat vsechny obyvatele
+        // jen vyber dat
+        if ($action == "obyvatele_list_search")
+        {
+            $count_on_page = 50;
+            $where_array = array();
+            // count_on_page a page se u prikazu count neuvazuje
+            $total = $obyvatele->adminSearchItems($search_string, "count", 1, 1);
+            //echo "total: $total"; exit;
 
-            $count = 50;
+            $obyvatele_list = $obyvatele->adminSearchItems($search_string, "data", $this->page_number, $count_on_page);
+
+        }
+        else if ($action == "obyvatele_list_all")
+        {
+            $count_on_page = 50;
             $where_array = array();
             // count_on_page a page se u prikazu count neuvazuje
             $total = $obyvatele->adminLoadItems("count", 1, 1, $where_array);
             //echo "total: $total"; exit;
 
+            $obyvatele_list = $obyvatele->adminLoadItems("data", $this->page_number, $count_on_page, $where_array, "prijmeni", "asc");
+        }
+
+        // vlastni controller pro list nebo search
+        if ($action == "obyvatele_list_search" || $action == "obyvatele_list_all") {
+            // vypsat vsechny obyvatele
+
             // vygenerovat strankovani - obecna metoda,
             $pagination_params["page_number"] = $this->page_number;
-            $pagination_params["count"] = $count;
+            $pagination_params["count"] = $count_on_page;
             $pagination_params["total"] = $total;
             $pagination_params["route"] = $this->route;
-            $pagination_params["route_params"] = array();
+            $pagination_params["route_params"] = array("action" => $action);
             $pagination_html = $this->renderPhp("admin/partials/admin_pagination.inc.php", $pagination_params, true);
             // echo $pagination_html; exit;
 
@@ -292,14 +314,20 @@ class obyvatele_controller extends ds1_base_controller
             $content_params["obyvatele_list_name"] = "všichni"; // dle filtru
             $content_params["obyvatel_detail_action"] = "obyvatel_detail_show";
             $content_params["obyvatel_update_prepare_action"] = "obyvatel_update_prepare";
-            $content_params["obyvatele_count"] = $count;
+            $content_params["obyvatele_count"] = $count_on_page;
             $content_params["obyvatele_total"] = $total;
             //$content_params["search_params"] = $search_params;
-            $content_params["obyvatele_list"] = $obyvatele->adminLoadItems("data", $this->page_number, $count, $where_array, "prijmeni", "asc");
+            $content_params["obyvatele_list"] = $obyvatele_list;
             $content_params["pagination_html"] = $pagination_html;
 
             // url pro vytvoreni obyvatele
             $content_params["url_obyvatel_add_prepare"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatel_add_prepare"));
+
+            // search
+            $content_params["form_search_submit_url"] = "";
+            $content_params["form_search_action"] = "obyvatele_list_search";
+            $content_params["search_string"] = $search_string;
+
 
             // vysledek nejake akce
             $content_params["result_msg"] = $result_msg;

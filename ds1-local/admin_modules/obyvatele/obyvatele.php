@@ -4,6 +4,7 @@ namespace ds1\admin_modules\obyvatele;
 
 
 use ds1\admin_modules\pokoje\pokoje;
+use PDO;
 
 class obyvatele extends \ds1\core\ds1_base_model
 {
@@ -126,9 +127,19 @@ class obyvatele extends \ds1\core\ds1_base_model
     }
 
 
-    /*
-    public function adminSearchItems($search = "", $type = "data", $page = 1, $count_on_page = 50, $order_by_field = "nazev") {
-        $table_name = TABLE_GOODS;
+    /**
+     * Hledani obyvatel.
+     *
+     * @param string $search
+     * @param string $type
+     * @param int $page
+     * @param int $count_on_page
+     * @param string $order_by_field
+     * @return int
+     *
+     */
+    public function adminSearchItems($search = "", $type = "data", $page = 1, $count_on_page = 50, $order_by_field = "prijmeni") {
+        $table_name = TABLE_OBYVATELE;
         $count_on_page += 0;
         $search = trim($search);
 
@@ -144,7 +155,7 @@ class obyvatele extends \ds1\core\ds1_base_model
             $limit_pom = "";
         }
 
-        // podminka
+        // podminka - musim BINDOVAT
         $where_pom = "";
         if ($search != "") {
             $where_pom .= "where ";
@@ -152,20 +163,24 @@ class obyvatele extends \ds1\core\ds1_base_model
             // pomocne
             $search_cislo = $search + 0;
 
-            // FIXME pres bindovani to nechodi
-            //$where_pom .= "`nazev` like \"%:search%\" ";
+            // POZOR: musi to byt bez uvozovek, jinak to nechodi!!!
+            // spravne: `prijmeni` like :search_like
+            // spatne: `prijmeni` like %:search_like% NEBO `prijmeni` like "%:search_like%"
+            $where_pom .= "`prijmeni` like :search_like ";        // prijmeni
+            $where_pom .= "or `jmeno` like :search_like ";        // prijmeni
+            $where_pom .= "or `pojistovna_zkratka` = :search ";     // pojistovna
 
-            $where_pom .= "`nazev` like \"%$search%\" ";        // nazev
 
             if ($search_cislo > 0) {
-                $where_pom .= "or `id` = \"$search\" ";             // id
-                $where_pom .= "or `cena_s_dph` = \"$search\" ";     // cena s dph
+                $where_pom .= "or `id` = :search ";             // id
 
-                // navic test na ISBN
+                // navic test na vek TODO
+                /*
                 if ($search_cislo > 10000) {
                     // muze to byt isbn
-                    $where_pom .= "or `isbn` like \"%$search%\" ";      // isbn
+                    $where_pom .= "or `isbn` like :search_like ";      // isbn
                 }
+                */
             }
         }
         // konec podminka
@@ -180,11 +195,16 @@ class obyvatele extends \ds1\core\ds1_base_model
         // echo $query;
         $statement = $this->PrepareStatement($query);
 
-        // FIXME bind parametr - uz nepotrebuju, musel jsem dat rucne
-        // nechodi
-        //$statement->bindValue(1, $search);
-        //printr($statement);
-        //bindValue(':calories', $calories, PDO::PARAM_INT);
+        // bind parametru
+        if (!$statement->bindValue(":search_like", "%{$search}%")) {
+            //echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+        if (!$statement->bindValue(":search", $search)) {
+            //echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        // nebo takto v execute:
+        // $statement->execute(array(":search_like" => "%{$search}%", ":search" => $search));
 
         // provest dotaz
         $statement->execute();
@@ -224,7 +244,6 @@ class obyvatele extends \ds1\core\ds1_base_model
             }
         }
     }
-    */
 
 
 
