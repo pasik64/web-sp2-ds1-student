@@ -26,6 +26,7 @@
                             <input size="50" name="search_string" value="<?php echo $search_string;?>"/>
                             -->
                             <script>
+                                window.url_obyvatele_autocomplete = "<?php echo $url_obyvatele_autocomplete;?>";
                                 window.search_string = "<?php echo $search_string;?>";
                                 window.base_url = "<?php echo $base_url;?>";
                             </script>
@@ -104,6 +105,8 @@
                                     <th>#</th>
                                     <th>příjmení</th>
                                     <th>jméno</th>
+                                    <th>pokoj</th>
+                                    <th>věk</th>
                                     <th>datum narození</th>
                                     <th>zkratka pojišťovny</th>
                                     <th>OP platnost DO</th>
@@ -123,11 +126,33 @@
                     $route_params["obyvatel_id"] = $obyvatel["id"];
                     $url_update_prepare = $this->makeUrlByRoute($route, $route_params);
 
+                    // url na detail pokoje
+                    $pokoj_nazev_pom = "";
+
+                    if (isset($obyvatel["pokoj"]["id"])) {
+                        $route_params = array();
+                        $route_params["action"] = "pokoj_detail_show"; // fixme: tady by to chtelo nejak obecne predat jmeno akce
+                        $route_params["pokoj_id"] = $obyvatel["pokoj"]["id"];
+                        $url_pokoj_detail = $this->makeUrlByRoute($pokoje_route_name, $route_params);
+                        $pokoj_nazev_pom = "<a href=\"$url_pokoj_detail\">$obyvatel[pokoj_nazev]</a>";
+                    }
+                    else {
+                        $pokoj_nazev_pom = $obyvatel["pokoj_nazev"];
+                    }
+
+
                     echo "<tr>";
 
                     echo "<td>$obyvatel[id]</td>";
                     echo "<td>$obyvatel[prijmeni]</td>";
                     echo "<td>$obyvatel[jmeno]</td>";
+                    echo "<td>$pokoj_nazev_pom</td>";
+
+                    // vek
+                    if (isset($obyvatel["vek"])) {
+                        echo "<td>$obyvatel[vek]</td>";
+                    }
+                    else echo "<td>&nbsp;</td>"; // index vek neni k dispozici
 
                     // toto mi prevede datum do spravneho formatu pro CR
                     echo "<td>".$controller->helperFormatDate($obyvatel["datum_narozeni"])."</td>";

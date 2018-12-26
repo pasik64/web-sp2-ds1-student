@@ -3,11 +3,49 @@
 namespace ds1\admin_modules\obyvatele;
 
 
+use DateTime;
+use DateTimeZone;
 use ds1\admin_modules\pokoje\pokoje;
 use PDO;
 
 class obyvatele extends \ds1\core\ds1_base_model
 {
+
+
+    /**
+     * Spocita vek k aktualnimu dni nebo ke dni v minulosti.
+     * @param $born_date
+     * @param string $current_date - k jakemu dni urcit vek, nechat prazdne pro aktualni datum
+     *
+     * @return int|void
+     */
+    public function getAge($born_date, $current_date = "") {
+        // pokud je prazdne, tak vratit
+        if (trim($born_date) == "") return;
+
+        $tz  = new DateTimeZone('Europe/Brussels');
+
+        if ($current_date == "")
+        {
+            $current_date_datetime = new DateTime('now',$tz);
+        }
+        else {
+            $current_date_datetime = DateTime::createFromFormat('Y-m-d', $current_date, $tz);
+        }
+
+        //echo "born:";
+        $born_datetime = DateTime::createFromFormat('Y-m-d', $born_date, $tz);
+        //printr($born_datetime);
+
+        // kontrola objektu
+        if (!is_object($current_date_datetime)) return;
+
+        // vlastni vypocet
+        $age = $born_datetime->diff($current_date_datetime)->y;
+        //echo $age;
+
+        return $age;
+    }
 
     // ************************************************************************************
     // *********   START ADMIN     ********************************************************
@@ -82,6 +120,34 @@ class obyvatele extends \ds1\core\ds1_base_model
         return $ok;
     }
 
+
+    /**
+     * Doplnit informaci do seznamu obyvatel. Napr. vek a aktualni pokoj.
+     * Tato metoda se musi volat pro rozumny pocet zaznamu, jinak bude trvat moc dlouho.
+     */
+    public function adminObyvateleAddedInformationToList($list) {
+        // projit seznam a doplnit
+        if ($list != null)
+            foreach ($list as $index => $item) {
+                // dopocitat vek
+                $list[$index]["vek"] = $this->getAge($item["datum_narozeni"]);
+
+                // zjistit aktualni pokoj = k dnesnimu dni
+                $pokoj = $this->getAktualniPokojByObyvatelID($item["id"]);
+                $list[$index]["pokoj"] = $pokoj;
+
+                if (isset($pokoj["nazev"])) {
+                    $list[$index]["pokoj_nazev"] = $pokoj["nazev"];
+                }
+                else {
+                    $list[$index]["pokoj_nazev"] = "";
+                }
+            }
+
+        //printr($list);
+        return $list;
+    }
+
     /**
      * Admin - nacist obyvatele.
      *
@@ -117,6 +183,9 @@ class obyvatele extends \ds1\core\ds1_base_model
 
         if ($type == "data") {
             // chci data - vratit data
+
+            // doplnit chybejici info
+            $rows = $this->adminObyvateleAddedInformationToList($rows);
             return $rows;
         } else {
             // chci jen count
@@ -225,6 +294,9 @@ class obyvatele extends \ds1\core\ds1_base_model
         {
             if ($type == "data") {
                 $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+                // doplnit chybejici info
+                $rows = $this->adminObyvateleAddedInformationToList($rows);
                 return $rows;
             } else {
                 // count
@@ -258,6 +330,85 @@ class obyvatele extends \ds1\core\ds1_base_model
 
 
     // *****************  UBYTOVANI ***********************
+
+    /**
+     * Vrati aktualni pokoj pro obyvatele k dnesnimu dni.
+     * @param $obyvatel_id
+     *
+     * @return array
+     */
+    public function getAktualniPokojByObyvatelID($obyvatel_id)
+    {
+        $obyvatel_id += 0;
+
+        if ($obyvatel_id == 0) return;
+
+        // select bohuzel obsahuje subselect, coz neni uplne idealni varianta z duvodu vykonosti, ale lepe to ted nejde
+        // v dotazu neni treba resit [or datum_do = ""], melo by to byt null nebo nejaky datum
+        /*
+         * select p.*,op.datum_od, op.datum_do from ds1_obyvatele_na_pokojich op, ds1_pokoje p
+            where
+            op.obyvatel_id = 1 and
+            op.pokoj_id = p.id and
+            op.datum_od =
+            (
+            select max(datum_od) from ds1_obyvatele_na_pokojich
+            where obyvatel_id = 1 and datum_od <= now() and (datum_do > now() or datum_do is null)
+            )
+         */
+
+        // slozit query
+        $query = "select p.*,op.datum_od, op.datum_do from `".TABLE_OBYVATELE_NA_POKOJICH."` op, `".TABLE_POKOJE."` p
+                    where
+                        op.obyvatel_id = :obyvatel_id and
+                        op.pokoj_id = p.id and
+                        op.datum_od = ( select max(datum_od) from `".TABLE_OBYVATELE_NA_POKOJICH."`
+                                        where 
+                                            obyvatel_id = :obyvatel_id and 
+                                            datum_od <= now() and
+                                            (datum_do > now() or datum_do is null) 
+                                       )
+                    limit 1";
+        //echo $query;
+        $statement = $this->PrepareStatement($query);
+
+        // bind parametru
+        if (!$statement->bindValue(":obyvatel_id", "{$obyvatel_id}")) {
+
+        }
+
+        // provest dotaz
+        $statement->execute();
+
+        // kontrola chyb
+        $errors = $statement->errorInfo();
+        //printr($errors);
+
+        $mysql_pdo_error = false;
+        if ($errors[0] + 0 > 0)
+        {
+            // nalezena chyba
+            $mysql_pdo_error = true;
+        }
+
+        // nacist data a vratit
+        if ($mysql_pdo_error == false)
+        {
+
+            $row = $statement->fetch(PDO::FETCH_ASSOC);
+            return $row;
+        }
+        else
+        {
+            // show debug info if it is allowed
+            if (DB_SHOW_DEBUG_INFO)
+            {
+                echo "Error in query - PDOStatement::errorInfo(): ";
+                printr($errors);
+                echo "SQL: $query";
+            }
+        }
+    }
 
     public function adminInsertUbytovaniObyvatele($item) {
         //printr($item);

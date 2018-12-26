@@ -8,6 +8,15 @@
         echo "<h3>Detail obyvatele #$obyvatel_id - $obyvatel[jmeno] $obyvatel[prijmeni] ("
             . $controller->helperFormatDate($obyvatel["datum_narozeni"])
             . ")</h3><br/>";
+
+
+        // slozit cele jmeno obyvatele s tituly
+        $obyvatel_cele_jmeno_tituly = "";
+
+        if (trim($obyvatel["tituly_pred"]) != "") $obyvatel_cele_jmeno_tituly = trim($obyvatel["tituly_pred"])." ";
+        $obyvatel_cele_jmeno_tituly .= trim($obyvatel["jmeno"])." ";
+        $obyvatel_cele_jmeno_tituly .= trim($obyvatel["prijmeni"]);
+        if (trim($obyvatel["tituly_za"]) != "") $obyvatel_cele_jmeno_tituly .= ", ".trim($obyvatel["tituly_za"]); // tituly za se oddeluji carkou od jmena
     ?>
     <div class="pull-right">
         <a href="<?php echo $url_obyvatele_list;?>" class="btn btn-default">Zpět na seznam obyvatel</a>
@@ -16,7 +25,13 @@
     <!-- start seznam zalozek  -->
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="zaklad-tab" data-toggle="tab" href="#zaklad" role="tab" aria-controls="zaklad" aria-selected="true">Základní údaje</a>
+            <a class="nav-link active" id="zaklad-tab" data-toggle="tab" href="#zaklad" role="tab" aria-controls="zaklad" aria-selected="true">Základní údaje (v1)</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="zaklad2-tab" data-toggle="tab" href="#zaklad2" role="tab" aria-controls="zaklad2" aria-selected="true">Základní údaje (v2)</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="zaklad3-tab" data-toggle="tab" href="#zaklad3" role="tab" aria-controls="zaklad3" aria-selected="true">Základní údaje (v3)</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="ubytovani-tab" data-toggle="tab" href="#ubytovani" role="tab" aria-controls="ubytovani" aria-selected="false">Ubytování</a>
@@ -34,7 +49,9 @@
         <div class="tab-pane fade show active" id="zaklad" role="tabpanel" aria-labelledby="zaklad-tab">
             <div class="container-fluid">
             <div class="row">
+                <div class="col-md-8">
                                 <?php
+                                // pro tabulkovy vypis
                                 $text_columns = array();
                                 $text_columns["jmeno"] = "Jméno";
                                 $text_columns["prijmeni"] = "Příjmení";
@@ -97,7 +114,16 @@
                                     echo "</table>";
                                 }
                                 ?>
-            </div>
+                </div>
+                <div class="col-md-4">
+                                <?php
+                                // fotka obyvatele - TODO melo by prijit z modelu
+                                $image_file_path = $base_url . "fotogalerie/obyvatele/3_test_dostal.jpg";
+                                echo "<img src=\"$image_file_path\" class=\"img-fluid\" alt=\"$obyvatel_cele_jmeno_tituly\">";
+                                ?>
+                                Poznámka: jen ilustrační foto. Fotky jsme ještě nenapojili.
+                </div>
+            </div><!-- konec row -->
 
             <div class="row">
                                 <div class="col-md-12">
@@ -109,6 +135,141 @@
             </div>
         </div>
         <!-- konec panel ZAKLAD  -->
+
+        <!-- start panel ZAKLAD 2  -->
+        <div class="tab-pane fade" id="zaklad2" role="tabpanel" aria-labelledby="zaklad2-tab">
+            <div class="row">
+                <div class="col-md-8">
+                    <?php
+                    echo "<h2>$obyvatel_cele_jmeno_tituly</h2>";
+                    echo "* ".$controller->helperFormatDate($obyvatel["datum_narozeni"])."<br/>";
+
+                    // IDENTIFIKACE A ADRESA vedle sebe
+                    echo "<div class=\"row\">";
+                        echo "<div class=\"col-md-6\">";
+
+                            echo "<br/><br/><h4>Identifikace</h4>";
+                            echo "RČ: $obyvatel[rodne_cislo] <br/>";
+                            echo "Č. poj.: $obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka]) <br/>";
+                            echo "OP: $obyvatel[op]<br/>
+                                    <small>(OP platnost do "
+                                .$controller->helperFormatDate($obyvatel["op_platnost_do"])
+                                .")</small><br/>";
+
+                    echo "</div>";
+                        echo "<div class=\"col-md-6\">";
+
+                            echo "<br/><br/><h4>Adresa</h4>";
+                            echo "$obyvatel[adresa_ulice] $obyvatel[adresa_cp]<br/>";
+                            echo "$obyvatel[adresa_mesto]<br/>";
+
+                        echo "</div>";
+                    echo "</div>";
+                    // KONEC IDENTIFIKACE A ADRESA
+
+                    echo "<br/><br/><h4>Ostatní</h4>";
+                    echo "místo narození: $obyvatel[misto_narozeni]<br/>";
+                    if (trim($obyvatel["rodne_prijmeni"]) != "") {
+                        // vypsat rodne prijmeni
+                        echo "rozený/á: $obyvatel[rodne_prijmeni]";
+                    }
+
+                    //printr($obyvatel);
+                    ?>
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="pull-right">
+                                <a href="<?php echo $url_obyvatel_update;?>" class="btn btn-primary btn-sm"><i class="icon-pencil"></i> Upravit</a><br/><br/>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                        // fotka obyvatele - TODO melo by prijit z modelu
+                        $image_file_path = $base_url . "fotogalerie/obyvatele/3_test_dostal.jpg";
+                        echo "<img src=\"$image_file_path\" class=\"img-fluid\" alt=\"$obyvatel_cele_jmeno_tituly\">";
+                    ?>
+                </div>
+            </div>
+        </div>
+        <!-- konec panel  ZAKLAD 2 -->
+
+        <!-- start panel ZAKLAD 3  -->
+        <div class="tab-pane fade" id="zaklad3" role="tabpanel" aria-labelledby="zaklad3-tab">
+
+            <?php
+                echo "<h2>$obyvatel_cele_jmeno_tituly";
+                echo " <small>(*".$controller->helperFormatDate($obyvatel["datum_narozeni"]).")</small></h2><br/>";
+            ?>
+
+            <div class="card-deck mb-3">
+
+                <div class="card mb-4 box-shadow" style="width: 18rem;">
+                    <?php
+                    // fotka obyvatele - TODO melo by prijit z modelu
+                    $image_file_path = $base_url . "fotogalerie/obyvatele/3_test_dostal.jpg";
+                    echo "<img src=\"$image_file_path\" class=\"card-img-top\" alt=\"$obyvatel_cele_jmeno_tituly\">";
+                    ?>
+
+                    <div class="card-body">
+                        <p class="card-text">Libovolná textová informace</p>
+                    </div>
+                </div>
+
+
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header text-center">
+                        <h4 class="my-0 font-weight-normal">Základní údaje</h4>
+                    </div>
+                    <div class="card-body">
+
+                        <h4 class="card-title">Identifikace</h4>
+
+                        <p class="card-text">
+                        <?php
+                        echo "RČ: $obyvatel[rodne_cislo] <br/>";
+                        echo "Č. poj.: $obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka]) <br/>";
+                        echo "OP: $obyvatel[op]<br/>
+                        <small>(OP platnost do "
+                            .$controller->helperFormatDate($obyvatel["op_platnost_do"])
+                            .")</small><br/>";
+                        ?>
+                        </p>
+
+                        <br/>
+                        <h4 class="card-title">Adresa</h4>
+                        <p class="card-text">
+                        <?php
+                        echo "$obyvatel[adresa_ulice] $obyvatel[adresa_cp]<br/>";
+                        echo "$obyvatel[adresa_mesto]<br/>";
+                        ?>
+                        </p>
+
+                    </div>
+                </div>
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header text-center">
+                        <h4 class="my-0 font-weight-normal">Ostatní</h4>
+                    </div>
+                    <div class="card-body">
+
+                        <?php
+                        echo "místo narození: $obyvatel[misto_narozeni]<br/>";
+                        if (trim($obyvatel["rodne_prijmeni"]) != "") {
+                        // vypsat rodne prijmeni
+                        echo "rozený/á: $obyvatel[rodne_prijmeni]";
+                        }
+                        ?>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+        <!-- konec panel ZAKLAD 3  -->
 
         <!-- start panel UBYTOVANI  -->
         <div class="tab-pane fade" id="ubytovani" role="tabpanel" aria-labelledby="ubytovani-tab">

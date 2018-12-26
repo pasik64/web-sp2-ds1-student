@@ -76,6 +76,17 @@
         }
 
 
+    // START RUCNI API, zatim to neni pridano do admin modulu
+    // obyvatele API
+    $routes->add("obyvatele_api",               // nejde pres konstantu, jeste tady neni z admin modulu
+        new Route("/plugin/obyvatele-api",
+            array(
+                '_controller' => "ds1\admin_modules\obyvatele\obyvatele_controller::apiAction"
+            )
+        ));
+    // KONEC API
+
+
     // 404 - stranka nenalezena TODO + pridat do .htaccess /404
 
 

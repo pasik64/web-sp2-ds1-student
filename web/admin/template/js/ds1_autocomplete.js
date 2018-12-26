@@ -9,8 +9,15 @@ angular.module('ds1', ['angucomplete-alt'])
          */
 
         $scope.rest_config = {};
+
+        // pro testy natvrdo
         //$scope.rest_config.autocomplete_url = "http://localhost/github_web-sp2-ds1-student/web/admin/autocomplete.php";
-        $scope.rest_config.autocomplete_url = $window.base_url + "autocomplete.php";
+
+        // pro testy s base_url dle aktualni domeny
+        // $scope.rest_config.autocomplete_url = $window.base_url + "autocomplete_pom.php";
+
+        // produkcni pres routu
+        $scope.rest_config.autocomplete_url = $window.url_obyvatele_autocomplete;
 
         $scope.debug = {};
         $scope.debug.rest = true;

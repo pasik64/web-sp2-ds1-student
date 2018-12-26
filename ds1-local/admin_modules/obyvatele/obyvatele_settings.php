@@ -15,3 +15,12 @@
     if (!defined("TABLE_OBYVATELE_NA_POKOJICH")) {
         define("TABLE_OBYVATELE_NA_POKOJICH", TABLE_PREFIX."obyvatele_na_pokojich");
     }
+
+
+    if (!defined("DS1_ROUTE_ADMIN_OBYVATELE")) {
+        define("DS1_ROUTE_ADMIN_OBYVATELE", "obyvatele");
+    }
+
+    if (!defined("DS1_ROUTE_ADMIN_OBYVATELE_API")) {
+        define("DS1_ROUTE_ADMIN_OBYVATELE_API", "obyvatele_api");
+    }

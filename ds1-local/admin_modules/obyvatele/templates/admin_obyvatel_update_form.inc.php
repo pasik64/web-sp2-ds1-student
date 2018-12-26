@@ -23,6 +23,7 @@
 
                             $text_columns["datum_narozeni"] = "Datum narození";
                             $text_columns["tituly_pred"] = "Tituly před";
+                            $text_columns["tituly_za"] = "Tituly za";
                             $text_columns["rodne_cislo"] = "Rodné číslo";
                             $text_columns["misto_narozeni"] = "Místo narození";
 
