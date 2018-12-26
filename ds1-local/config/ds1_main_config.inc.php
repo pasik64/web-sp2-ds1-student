@@ -64,18 +64,22 @@
         // uzivatele, kteri pracuji s aplikaci
         define("TABLE_USERS_ADMIN", TABLE_PREFIX."uzivatele");
 
-        // obyvatele = pacienti
-        define("TABLE_OBYVATELE", TABLE_PREFIX."obyvatele");
-
-        // obyvatele na pokojich
-        define("TABLE_OBYVATELE_NA_POKOJICH", TABLE_PREFIX."obyvatele_na_pokojich");
-
-        // pokoje
-        define("TABLE_POKOJE", TABLE_PREFIX."pokoje");
-        define("TABLE_SKUPINY_POKOJU", TABLE_PREFIX."skupiny_pokoju");
-
         // NAZVY SLOUPCU V DB, pokud jsou treba
         define("TABLE_USER_COLUMN_PASSWORD_BCRYPT", "password_bcrypt");
+
+        /* konstanty k pluginum se presunuly do konfigurace jednotlivych modulu - napr. pokoje/pokoje_settings.php
+         * ds1.php - metoda setModulesForAdmin nacte vsechny konstanty k modulum
+         * vsechny konstanty jsou automaticky globalni - vlastnost php
+         */
+
+        // obyvatele = pacienti - konstanta presunuta k pluginu (presun konfigurace)
+        // define("TABLE_OBYVATELE", TABLE_PREFIX."obyvatele");
+
+        // obyvatele na pokojich - presun konfigurace
+        //define("TABLE_OBYVATELE_NA_POKOJICH", TABLE_PREFIX."obyvatele_na_pokojich");
+
+        // INFO: modul pokoje - KONSTANTY - presun do pokoje_settings.php
+
 
     // ****************************************************************************************
     // ***********    KONEC DB      ***********************************************************

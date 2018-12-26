@@ -9,6 +9,7 @@ class pokoje extends \ds1\core\ds1_base_model
     // *********   START ADMIN     ********************************************************
     // ************************************************************************************
 
+
     /**
      * Existuje polozka dle ID? Pozor: kontrola pouze existence ID. Nebere se v uvahu VIDITELNOST.
      * @param $id
