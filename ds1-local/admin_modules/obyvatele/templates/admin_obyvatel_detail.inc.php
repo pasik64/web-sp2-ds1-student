@@ -50,7 +50,184 @@
             <div class="container-fluid">
             <div class="row">
                 <div class="col-md-8">
-                                <?php
+
+
+                    <div id="accordion" role="tablist" style='max-width: 550px;'>
+                        <div class="card mb-0">
+                            <div class="card-header" id="headingOne" role="tab">
+                                <h5 class="mb-0">
+                                    <style>
+                                        #headingOne a:before {
+                                            content: "\f107";
+
+                                            font-family: "FontAwesome";
+                                            font-weight: 900;
+                                            width: 55px;
+                                            height: 100%;
+                                            text-align: center;
+                                            line-height: 50px;
+                                            //border-left: 2px solid #D11149;
+                                            position: absolute;
+                                            top: 0;
+                                            right: 0;
+                                        }
+
+                                        #headingOne a.collapsed:before {
+                                            content: "\f106";
+
+                                    </style>
+
+                                    <a data-toggle="collapse" href="#collapseOne" onclick='console.log($("#collapseOne").hasClass("show"));' aria-expanded="true" aria-controls="collapseOne" style="color: #000; font-size: 16px;">
+                                        Základní údaje &nbsp;<span ng-hide='$("#collapseOne").hasClass("show")' class="pull-right" style="padding-right: 50px; color: gray; font-size: 14px;"><?php echo "$obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka])"; ?></span>
+                                    </a>
+                                </h5>
+                            </div>
+                            <div class="collapse show" id="collapseOne" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion" style="">
+                                <div class="card-body">
+
+
+                                    <div id="accordion_zakladni2" role="tablist" style='max-width: 550px;'>
+                                        <div class="card mb-0">
+                                            <div class="card-header" id="klicovy_zamestnanec_headingOne" role="tab">
+                                                <h5 class="mb-0">
+                                                    <a data-toggle="collapse" href="#zakladni2_body1" class="collapsed" style="color: #000; font-size: 16px;">
+                                                        Identifikace &nbsp;<span class="pull-right" style="color: gray; font-size: 14px;"><?php echo "$obyvatel[rodne_cislo] (RČ)"; ?></span>
+                                                    </a>
+                                                </h5>
+                                            </div>
+                                            <div class="collapse" id="zakladni2_body1" role="tabpanel" data-parent="#accordion_zakladni2" style="">
+                                                <div class="card-body">
+                                                    <table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>
+                                                        <?php
+                                                        echo "<tr><th class='w-20'>Rodné číslo</th><td class='w-30'>$obyvatel[rodne_cislo]</td></tr>";
+                                                        echo "<tr><th class='w-20'>Adresa</th><td class='w-30'>$obyvatel[adresa_ulice] $obyvatel[adresa_cp], $obyvatel[adresa_mesto]</td></tr>";
+                                                        echo "<tr><th class='w-20'>Číslo pojištěnce (pojišťovna)</th><td class='w-30'>$obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka])</td></tr>";
+                                                        ?>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card mb-0">
+                                            <div class="card-header" id="klicovy_zamestnanec_headingTwo" role="tab">
+                                                <h5 class="mb-0">
+                                                    <a data-toggle="collapse" href="#zakladni2_body2" class="collapsed" style="color: #000; font-size: 16px;">
+                                                        Adresa &nbsp;<span class="pull-right" style="color: gray; font-size: 14px;"><?php echo "$obyvatel[adresa_ulice] $obyvatel[adresa_cp], $obyvatel[adresa_mesto]"; ?></span>
+                                                    </a>
+                                                </h5>
+                                            </div>
+                                            <div class="collapse" id="zakladni2_body2" role="tabpanel" data-parent="#accordion_zakladni2" style="">
+                                                <div class="card-body">
+                                                    <table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>
+                                                        <?php
+                                                        echo "<tr><th class='w-20'>Adresa - ulice</th><td class='w-30'>$obyvatel[adresa_ulice]</td></tr>";
+                                                        echo "<tr><th class='w-20'>Adresa - čp</th><td class='w-30'>$obyvatel[adresa_cp]</td></tr>";
+                                                        echo "<tr><th class='w-20'>Adresa - město</th><td class='w-30'>$obyvatel[adresa_mesto]</td></tr>";
+                                                        ?>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--
+                        <div class="card mb-0">
+                            <div class="card-header" id="headingTwo" role="tab">
+                            <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Collapsible Group Item #2</a>
+                            </h5>
+                            </div>
+                            <div class="collapse" id="collapseTwo" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion" style="">
+                            <div class="card-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt
+                            aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat
+                            craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</div>
+                            </div>
+                        </div>
+                        <div class="card mb-0">
+                                <div class="card-header" id="headingThree" role="tab">
+                                <h5 class="mb-0">
+                                <a class="collapsed" data-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Collapsible Group Item #3</a>
+                                </h5>
+                                </div>
+                                <div class="collapse" id="collapseThree" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion" style="">
+                                <div class="card-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt
+                                aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat
+                                craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</div>
+                                </div>
+                        </div>
+                        -->
+                    </div><!-- konec accordion -->
+
+                    <br/>
+
+                    <div id="accordion_pobyt" role="tablist" style='max-width: 550px;'>
+                        <div class="card mb-0">
+                            <div class="card-header" id="pobyt_headingOne" role="tab">
+                                <h5 class="mb-0">
+                                    <a data-toggle="collapse" href="#pobyt_collapseOne" class="collapsed" style="color: #000; font-size: 16px;">
+                                        Pobyt &nbsp;<span class="pull-right" style="color: gray; font-size: 14px;">TODO vytáhnout extra</span>
+                                    </a>
+                                </h5>
+                            </div>
+                            <div class="collapse" id="pobyt_collapseOne" role="tabpanel" data-parent="#accordion_pobyt" style="">
+                                <div class="card-body">
+                                    <table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>
+                                        <?php
+                                        echo "<tr><th class='w-20'>Pokoj</th><td class='w-30'>TODO pokoj</td></tr>";
+                                        ?>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br/>
+
+
+                    <div id="accordion_klicovy_zamestnanec" role="tablist" style='max-width: 550px;'>
+                        <div class="card mb-0">
+                            <div class="card-header" id="klicovy_zamestnanec_headingOne" role="tab">
+                                <h5 class="mb-0">
+                                    <a data-toggle="collapse" href="#klicovy_collapseOne" class="collapsed" style="color: #000; font-size: 16px;">
+                                        Klíčový zaměstnanec &nbsp;<span class="pull-right" style="color: gray; font-size: 14px;"><?php echo "$obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka])"; ?></span>
+                                    </a>
+                                </h5>
+                            </div>
+                            <div class="collapse" id="klicovy_collapseOne" role="tabpanel" data-parent="#accordion_klicovy_zamestnanec" style="">
+                                <div class="card-body">
+                                    <form>
+                                    <table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>
+                                        <?php
+                                        echo "<tr><td class='w-20'>Jan Novák (ID: 5)</td><td class='w-30'>1.1.2018 - 10.1.2019</td>
+                                                    <td><a href='#' class='btn btn-primary btn-sm'><i class=\"icon-pencil\"></i></a> &nbsp;
+                                                        <a href='#' class='btn btn-danger btn-sm'><i class=\"icon-trash\"></i></a></td>                                                
+                                                    </tr>";
+                                        ?>
+                                    </table>
+
+                                    <strong>TODO tady tlačítko pro zobrazení následujícího formuláře nebo rovnou zobrazit?</strong>
+                                    <h4>Přidat zaměstnance</h4>
+                                    <table class="table table-bordered table-striped">
+                                        <tr><td>Zaměstnanec:</td><td><select class="form-control"><option>Martin Dostal (3)</option></select></td></tr>
+                                        <tr><td>od:</td>
+                                            <td><input type="date" class="form-control" size="6"></td></tr>
+                                        <tr><td>do</td><td><input type="date" class="form-control" size="6"></td></tr>
+                                        <tr><td>&nbsp;</td><td><input type="submit" value="Přidat" class="btn btn-primary btn-sm"></td></tr>
+                                    </table>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br/><br/><br/>
+
+<?php
+                                // AUTOMATICKY VYPIS VSEHO
                                 // pro tabulkovy vypis
                                 $text_columns = array();
                                 $text_columns["jmeno"] = "Jméno";
