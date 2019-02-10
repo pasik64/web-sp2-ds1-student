@@ -81,6 +81,13 @@
         // INFO: modul pokoje - KONSTANTY - presun do pokoje_settings.php
 
 
+        // dodatky pro modul dokumentace
+        define("TABLE_DOKUMENTACE", "dokumentace");
+        define("TABLE_DOKUMENTACE_DRUH_ZAPISU", "dokumentace_druh_zapisu");
+        define("TABLE_DRUH_ZAPISU_UZIVATELSKE_ROLE", "druh_zapisu_uzivatelske_role");
+        define("TABLE_UZIVATELSKE_ROLE", "uzivatelske_role");
+        define("TABLE_UZIVATELE_PRIDELENI_ROLI", "uzivatele_prideleni_roli");
+
     // ****************************************************************************************
     // ***********    KONEC DB      ***********************************************************
     // ****************************************************************************************
