@@ -4,3 +4,72 @@
 .box-shadow {
     box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, .05);
 }
+
+
+
+/* ************************************************************************************************************ */
+/* **************    OBYVATELE       ************************************************************************** */
+/* ************************************************************************************************************ */
+/* vnejsi accordion */
+.obyvatele_detail_accordion1 {}
+.obyvatele_detail_accordion1 .card-header {padding: 0.5rem 1.25rem; background-color: #fff; /* defaultne #f0f3f5 */}
+.obyvatele_detail_accordion1 .card-header a {color: #000; font-size: 16px;}
+
+/* rozbaleny symbol */
+.obyvatele_detail_accordion1 .card-header a:before {
+    content: "\f107";
+
+    font-family: "FontAwesome";
+    font-weight: 900;
+    width: 55px;
+    height: 100%;
+    text-align: center;
+    line-height: 40px; /* timto lze nastavit svisle zarovnani znaku*/
+    /*border-left: 2px solid #D11149;*/
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+/* zabaleny symbol */
+.obyvatele_detail_accordion1 .card-header a.collapsed:before {content: "\f106";}
+
+/* vlastni modry text v hlavicce acordionu, v divu, jinak nejde nastavit width */
+.obyvatele_detail_accordion1 .card-header .accordion_header_value {float: right; width: 80%; text-align: center; padding-right: 50px; color: #5fb2da; font-size: 14px;}
+
+.obyvatele_detail_accordion1 .card-body {padding: 0.25rem; }
+
+/* ******************************************************** */
+/* vnitrni accordion = vnoreny  */
+.obyvatele_detail_accordion2 {}
+
+/* rozbaleno */
+.obyvatele_detail_accordion2 .card-header a {font-weight: bold;} /* rozkliknute je tucne */
+
+/* jenom pres css zajistuji zobrazeni a skryti informace
+.obyvatele_detail_accordion2 .card-header a .accordion_header_value {display: none;}  */
+
+.obyvatele_detail_accordion2 .card-header a:before {
+    position: absolute; top: 0; left: 0;
+    content: "\f107";
+    font-family: "FontAwesome";
+}
+
+/*zabaleno*/
+.obyvatele_detail_accordion2 .card-header a.collapsed {font-weight: normal;} /* nerozkliknute normalni */
+/*.obyvatele_detail_accordion2 .card-header a.collapsed  .accordion_header_value {display: inline-block;}*/
+.obyvatele_detail_accordion2 .card-header a.collapsed:before {
+    position: absolute; top: 0; left: 0;
+    content: "\f105";
+    font-family: "FontAwesome";}
+
+/* odsazeni textu vnitrniho acordionu*/
+.obyvatele_detail_accordion2 .card-header {padding-left: 50px; }
+
+/*defaultni pozadi headeru z bootstrapu, ale acordionem 1 jsem si to prepsal*/
+.obyvatele_detail_accordion2 .card-header {background-color: #f0f3f5; }
+.obyvatele_detail_accordion2 .card-body .table {margin-bottom: 0px; }
+
+/* ************************************************************************************************************ */
+/* **************   KONEC   OBYVATELE       ******************************************************************* */
+/* ************************************************************************************************************ */

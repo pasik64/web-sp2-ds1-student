@@ -2,6 +2,11 @@
 /**
  *   Detail obyvatele
  */
+
+    // definice, ktera pole jsou datumy
+    $dates_text_columns_keys = array();
+    $dates_text_columns_keys[] = "datum_narozeni";
+    $dates_text_columns_keys[] = "op_platnost_do";
 ?>
 <div class="container-fluid">
     <?php
@@ -25,13 +30,7 @@
     <!-- start seznam zalozek  -->
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="zaklad-tab" data-toggle="tab" href="#zaklad" role="tab" aria-controls="zaklad" aria-selected="true">Základní údaje (v1)</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="zaklad2-tab" data-toggle="tab" href="#zaklad2" role="tab" aria-controls="zaklad2" aria-selected="true">Základní údaje (v2)</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="zaklad3-tab" data-toggle="tab" href="#zaklad3" role="tab" aria-controls="zaklad3" aria-selected="true">Základní údaje (v3)</a>
+            <a class="nav-link active" id="zaklad-tab" data-toggle="tab" href="#zaklad" role="tab" aria-controls="zaklad" aria-selected="true">Základní údaje</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="ubytovani-tab" data-toggle="tab" href="#ubytovani" role="tab" aria-controls="ubytovani" aria-selected="false">Ubytování</a>
@@ -49,151 +48,182 @@
         <div class="tab-pane fade show active" id="zaklad" role="tabpanel" aria-labelledby="zaklad-tab">
             <div class="container-fluid">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-10">
+
+                    <?php
+                        // automaticke acordiony k konfigurace sablony
+                        if ($template_config != null) {
+                            if (@$template_config["accordions_list1"] != null)
+                                foreach ($template_config["accordions_list1"] as $accordion1_id => $accordion1_value) {
+
+                                    // slozit accordion header text
+                                    // $accordion1_value[value] = [prijmeni] [jmeno]
+                                    $accordion_header_text = $controller->helperStringReplaceMarksWithDbValues($accordion1_value["value"], $obyvatel, array("keys_dates" => $dates_text_columns_keys));
+
+                                    echo "<div id='$accordion1_id' role='tablist' class='obyvatele_detail_accordion1'>
+                                            <div class='card mb-0'>
+                                                <div class='card-header' role='tab'>
+                                                    <h5 class='mb-0'>
+                                                        <a data-toggle=\"collapse\" href=\"#collapse_$accordion1_id\">
+                                                                $accordion1_value[title] &nbsp; <div class=\"accordion_header_value\">$accordion_header_text</div>
+                                                        </a>
+                                                    </h5>
+                                                </div><!-- card-header -->";
+
+                                    // start card body
+                                    echo "<div class='collapse show' id='collapse_$accordion1_id' role='tabpanel' data-parent='#$accordion1_id'>
+                                                <div class='card-body'>";
+
+                                    //printr($accordion1_value);
+
+                                    // vnorene acordiony
+                                    if (@$accordion1_value["subaccordions"] != null) {
+                                        foreach ($accordion1_value["subaccordions"] as $accordion2_id => $accordion2_value) {
+
+                                            // **************************************************************************
+                                            // START VNORENY ACORDION
+
+                                            // slozit popisek vnoreneho acordionu
+                                            $accordion_header_text2 =  $controller->helperStringReplaceMarksWithDbValues($accordion2_value["value"], $obyvatel, array("keys_dates" => $dates_text_columns_keys));
+
+                                            echo "<div id='$accordion2_id' role='tablist' class='obyvatele_detail_accordion2'>
+                                            <div class='card mb-0'>
+                                                <div class='card-header' role='tab'>
+                                                    <h5 class='mb-0'>
+                                                        <!-- prihodi se class collapsed, pokud je to zabalene-->
+                                                        <a data-toggle=\"collapse\" href=\"#collapse_$accordion2_id\" class='collapsed'>
+                                                                $accordion2_value[title] &nbsp; <div class=\"accordion_header_value\">$accordion_header_text2</div>
+                                                        </a>
+                                                    </h5>
+                                                </div><!-- card-header -->";
+
+                                                // start card body - pridanim show se zobrazi
+                                                echo "<div class='collapse' id='collapse_$accordion2_id' role='tabpanel' data-parent='#$accordion2_id'>
+                                                    <div class='card-body'>";
+
+                                                        if ($accordion2_value["fields"] != null)
+                                                        {
+                                                            echo "<table class='table table-bordered table-sm'>";
+
+                                                            foreach ($accordion2_value["fields"] as $field_key => $field_title) {
+
+                                                                // fixace datumu
+                                                                if (in_array($field_key, $dates_text_columns_keys)) {
+                                                                    // datum
+                                                                    $field_text_db = $controller->helperFormatDate($obyvatel[$field_key]);
+                                                                } else {
+                                                                    // text
+                                                                    $field_text_db = $obyvatel[$field_key];
+                                                                }
+
+                                                                echo "<tr><th class='w-25'>$field_title</th><td>$field_text_db</td></tr>";
+                                                            }
+
+                                                            echo "</table>";
+                                                        }
 
 
-                    <div id="accordion" role="tablist" style='max-width: 550px;'>
-                        <div class="card mb-0">
-                            <div class="card-header" id="headingOne" role="tab">
-                                <h5 class="mb-0">
-                                    <style>
-                                        #headingOne a:before {
-                                            content: "\f107";
+                                                    echo "</div></div>"; // konec card-body a .collapse
+                                                    // konec card body
 
-                                            font-family: "FontAwesome";
-                                            font-weight: 900;
-                                            width: 55px;
-                                            height: 100%;
-                                            text-align: center;
-                                            line-height: 50px;
-                                            //border-left: 2px solid #D11149;
-                                            position: absolute;
-                                            top: 0;
-                                            right: 0;
+                                                    echo "</div>"; // konec .card
+                                                    echo "</div><!-- #$accordion1_id -->"; // konec accordion
+                                            // KONEC VNORENY ACORDION
+                                            // **************************************************************************
                                         }
-
-                                        #headingOne a.collapsed:before {
-                                            content: "\f106";
-
-                                    </style>
-
-                                    <a data-toggle="collapse" href="#collapseOne" onclick='console.log($("#collapseOne").hasClass("show"));' aria-expanded="true" aria-controls="collapseOne" style="color: #000; font-size: 16px;">
-                                        Základní údaje &nbsp;<span ng-hide='$("#collapseOne").hasClass("show")' class="pull-right" style="padding-right: 50px; color: gray; font-size: 14px;"><?php echo "$obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka])"; ?></span>
-                                    </a>
-                                </h5>
-                            </div>
-                            <div class="collapse show" id="collapseOne" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion" style="">
-                                <div class="card-body">
+                                    }
 
 
-                                    <div id="accordion_zakladni2" role="tablist" style='max-width: 550px;'>
-                                        <div class="card mb-0">
-                                            <div class="card-header" id="klicovy_zamestnanec_headingOne" role="tab">
-                                                <h5 class="mb-0">
-                                                    <a data-toggle="collapse" href="#zakladni2_body1" class="collapsed" style="color: #000; font-size: 16px;">
-                                                        Identifikace &nbsp;<span class="pull-right" style="color: gray; font-size: 14px;"><?php echo "$obyvatel[rodne_cislo] (RČ)"; ?></span>
-                                                    </a>
-                                                </h5>
-                                            </div>
-                                            <div class="collapse" id="zakladni2_body1" role="tabpanel" data-parent="#accordion_zakladni2" style="">
-                                                <div class="card-body">
-                                                    <table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>
-                                                        <?php
-                                                        echo "<tr><th class='w-20'>Rodné číslo</th><td class='w-30'>$obyvatel[rodne_cislo]</td></tr>";
-                                                        echo "<tr><th class='w-20'>Adresa</th><td class='w-30'>$obyvatel[adresa_ulice] $obyvatel[adresa_cp], $obyvatel[adresa_mesto]</td></tr>";
-                                                        echo "<tr><th class='w-20'>Číslo pojištěnce (pojišťovna)</th><td class='w-30'>$obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka])</td></tr>";
-                                                        ?>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    echo "</div></div>"; // konec card-body a .collapse
+                                    // konec card body
 
-                                        <div class="card mb-0">
-                                            <div class="card-header" id="klicovy_zamestnanec_headingTwo" role="tab">
-                                                <h5 class="mb-0">
-                                                    <a data-toggle="collapse" href="#zakladni2_body2" class="collapsed" style="color: #000; font-size: 16px;">
-                                                        Adresa &nbsp;<span class="pull-right" style="color: gray; font-size: 14px;"><?php echo "$obyvatel[adresa_ulice] $obyvatel[adresa_cp], $obyvatel[adresa_mesto]"; ?></span>
-                                                    </a>
-                                                </h5>
-                                            </div>
-                                            <div class="collapse" id="zakladni2_body2" role="tabpanel" data-parent="#accordion_zakladni2" style="">
-                                                <div class="card-body">
-                                                    <table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>
-                                                        <?php
-                                                        echo "<tr><th class='w-20'>Adresa - ulice</th><td class='w-30'>$obyvatel[adresa_ulice]</td></tr>";
-                                                        echo "<tr><th class='w-20'>Adresa - čp</th><td class='w-30'>$obyvatel[adresa_cp]</td></tr>";
-                                                        echo "<tr><th class='w-20'>Adresa - město</th><td class='w-30'>$obyvatel[adresa_mesto]</td></tr>";
-                                                        ?>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    echo "</div>"; // konec .card
+                                    echo "</div><!-- #$accordion1_id -->"; // konec accordion
 
-                                    </div>
+                                    echo "<br/>"; // mezera mezi accordiony
+                                }
+                        }
+                    ?>
 
-                                </div>
-                            </div>
-                        </div>
-                        <!--
-                        <div class="card mb-0">
-                            <div class="card-header" id="headingTwo" role="tab">
-                            <h5 class="mb-0">
-                            <a class="collapsed" data-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Collapsible Group Item #2</a>
-                            </h5>
-                            </div>
-                            <div class="collapse" id="collapseTwo" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion" style="">
-                            <div class="card-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt
-                            aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat
-                            craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</div>
-                            </div>
-                        </div>
-                        <div class="card mb-0">
-                                <div class="card-header" id="headingThree" role="tab">
-                                <h5 class="mb-0">
-                                <a class="collapsed" data-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Collapsible Group Item #3</a>
-                                </h5>
-                                </div>
-                                <div class="collapse" id="collapseThree" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion" style="">
-                                <div class="card-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt
-                                aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat
-                                craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</div>
-                                </div>
-                        </div>
-                        -->
-                    </div><!-- konec accordion -->
 
-                    <br/>
-
-                    <div id="accordion_pobyt" role="tablist" style='max-width: 550px;'>
+                    <!-- POBYT  START  -->
+                    <div id="accordion_pobyt" role="tablist" class='obyvatele_detail_accordion1'>
                         <div class="card mb-0">
                             <div class="card-header" id="pobyt_headingOne" role="tab">
                                 <h5 class="mb-0">
-                                    <a data-toggle="collapse" href="#pobyt_collapseOne" class="collapsed" style="color: #000; font-size: 16px;">
-                                        Pobyt &nbsp;<span class="pull-right" style="color: gray; font-size: 14px;">TODO vytáhnout extra</span>
+
+                                    <?php
+                                        // hledat aktualni pobyt - maximalni datum od TEMP, FIXME pres nejakou lepsi metodu
+                                        $aktualni_ubytovani_datum_od = "";
+                                        $aktualni_ubytovani_pokoj = "";
+
+                                        if ($obyvatel_na_pokojich != null)
+                                        foreach ($obyvatel_na_pokojich as $ubytovani) {
+                                            if ($ubytovani["datum_od"] > $aktualni_ubytovani_datum_od) {
+                                                $aktualni_ubytovani_datum_od = $ubytovani["datum_od"];
+                                                $aktualni_ubytovani_pokoj = $ubytovani["pokoj_nazev"];
+                                            }
+                                        }
+
+                                       // echo "<td>".$controller->helperFormatDateAuto($ubytovani["datum_od"])."</td>";
+                                    ?>
+
+                                    <a data-toggle="collapse" href="#pobyt_collapseOne" class="collapsed">
+                                        Pobyt
+                                        <div class="accordion_header_value">
+                                            <?php echo $aktualni_ubytovani_pokoj." <small>(od ".$controller->helperFormatDateAuto($aktualni_ubytovani_datum_od).")</small>"; ?>
+                                        </div>
                                     </a>
                                 </h5>
                             </div>
                             <div class="collapse" id="pobyt_collapseOne" role="tabpanel" data-parent="#accordion_pobyt" style="">
                                 <div class="card-body">
-                                    <table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>
-                                        <?php
-                                        echo "<tr><th class='w-20'>Pokoj</th><td class='w-30'>TODO pokoj</td></tr>";
-                                        ?>
-                                    </table>
+                                    <?php
+                                    //printr($obyvatel_na_pokojich);
+                                    if ($obyvatel_na_pokojich != null){
+                                        echo "<table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>";
+                                        echo "<tr><th>Datum od</th><th>Datum do</th><th>Název pokoje</th><th>Poschodí</th><th>Pokoj ID (#)</th></tr>";
+
+                                        foreach ($obyvatel_na_pokojich as $ubytovani) {
+
+                                            // url na detail pokoje
+                                            $url_pokoj_detail = $controller->makeUrlByRoute($pokoje_route_name,
+                                                array("action" => "pokoj_detail_show", "pokoj_id" => $ubytovani["pokoj_id"])
+                                            );
+
+                                            echo "<tr>";
+                                            // toto bude navic datetime
+                                            echo "<td>".$controller->helperFormatDateAuto($ubytovani["datum_od"])."</td>";
+                                            echo "<td>".$controller->helperFormatDateAuto($ubytovani["datum_do"])."</td>";
+                                            echo "<td><a href='$url_pokoj_detail'>$ubytovani[pokoj_nazev]</a></td>";
+                                            echo "<td>$ubytovani[pokoj_poschodi]</td>";
+                                            echo "<td>$ubytovani[pokoj_id]</td>";
+                                            echo "</tr>";
+                                        }
+                                        echo "</table>";
+                                    }
+
+                                    ?>
+
+                                    <div>
+                                        <!-- odkaz pro pridani obyvatele do pokoje -->
+                                        <a href="<?php echo $url_obyvatele_na_pokoje_add_prepare;?>" class="btn btn-primary btn-sm"><i class="icon-pencil"></i> Změnit ubytování</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <!-- POBYT  KONEC  -->
 
                     <br/>
 
 
-                    <div id="accordion_klicovy_zamestnanec" role="tablist" style='max-width: 550px;'>
+                    <div id="accordion_klicovy_zamestnanec" role="tablist"  class='obyvatele_detail_accordion1'>
                         <div class="card mb-0">
                             <div class="card-header" id="klicovy_zamestnanec_headingOne" role="tab">
                                 <h5 class="mb-0">
                                     <a data-toggle="collapse" href="#klicovy_collapseOne" class="collapsed" style="color: #000; font-size: 16px;">
-                                        Klíčový zaměstnanec &nbsp;<span class="pull-right" style="color: gray; font-size: 14px;"><?php echo "$obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka])"; ?></span>
+                                        Klíčový zaměstnanec
                                     </a>
                                 </h5>
                             </div>
@@ -227,7 +257,13 @@
                     <br/><br/><br/>
 
 <?php
-                                // AUTOMATICKY VYPIS VSEHO
+        // konfigurace sablony
+        echo "<h2>Konfigurace výpisu v .jsonu</h2>";
+        printr($template_config);
+
+
+
+// AUTOMATICKY VYPIS VSEHO
                                 // pro tabulkovy vypis
                                 $text_columns = array();
                                 $text_columns["jmeno"] = "Jméno";
@@ -248,10 +284,6 @@
                                 $text_columns["op"] = "OP";
                                 $text_columns["op_platnost_do"] = "OP platnost do";
 
-                                // definice, ktera pole jsou datumy
-                                $dates_text_columns_keys = array();
-                                $dates_text_columns_keys[] = "datum_narozeni";
-                                $dates_text_columns_keys[] = "op_platnost_do";
 
                                 // tridy pro konkretni polozky
                                 $classes_for_columns = array();
@@ -272,7 +304,7 @@
                                     foreach ($text_columns as $key => $value) {
 
                                         echo "<tr>";
-                                        echo "<th class='w-20'>$value</th>";
+                                        echo "<th class='w-20'>$value [$key]</th>";
                                         echo "<td class='w-30'>";
 
                                         // je to text nebo datum
@@ -292,7 +324,7 @@
                                 }
                                 ?>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                                 <?php
                                 // fotka obyvatele - TODO melo by prijit z modelu
                                 $image_file_path = $base_url . "fotogalerie/obyvatele/3_test_dostal.jpg";
@@ -313,140 +345,6 @@
         </div>
         <!-- konec panel ZAKLAD  -->
 
-        <!-- start panel ZAKLAD 2  -->
-        <div class="tab-pane fade" id="zaklad2" role="tabpanel" aria-labelledby="zaklad2-tab">
-            <div class="row">
-                <div class="col-md-8">
-                    <?php
-                    echo "<h2>$obyvatel_cele_jmeno_tituly</h2>";
-                    echo "* ".$controller->helperFormatDate($obyvatel["datum_narozeni"])."<br/>";
-
-                    // IDENTIFIKACE A ADRESA vedle sebe
-                    echo "<div class=\"row\">";
-                        echo "<div class=\"col-md-6\">";
-
-                            echo "<br/><br/><h4>Identifikace</h4>";
-                            echo "RČ: $obyvatel[rodne_cislo] <br/>";
-                            echo "Č. poj.: $obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka]) <br/>";
-                            echo "OP: $obyvatel[op]<br/>
-                                    <small>(OP platnost do "
-                                .$controller->helperFormatDate($obyvatel["op_platnost_do"])
-                                .")</small><br/>";
-
-                    echo "</div>";
-                        echo "<div class=\"col-md-6\">";
-
-                            echo "<br/><br/><h4>Adresa</h4>";
-                            echo "$obyvatel[adresa_ulice] $obyvatel[adresa_cp]<br/>";
-                            echo "$obyvatel[adresa_mesto]<br/>";
-
-                        echo "</div>";
-                    echo "</div>";
-                    // KONEC IDENTIFIKACE A ADRESA
-
-                    echo "<br/><br/><h4>Ostatní</h4>";
-                    echo "místo narození: $obyvatel[misto_narozeni]<br/>";
-                    if (trim($obyvatel["rodne_prijmeni"]) != "") {
-                        // vypsat rodne prijmeni
-                        echo "rozený/á: $obyvatel[rodne_prijmeni]";
-                    }
-
-                    //printr($obyvatel);
-                    ?>
-                </div>
-                <div class="col-md-4">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="pull-right">
-                                <a href="<?php echo $url_obyvatel_update;?>" class="btn btn-primary btn-sm"><i class="icon-pencil"></i> Upravit</a><br/><br/>
-                            </div>
-                        </div>
-                    </div>
-                    <?php
-                        // fotka obyvatele - TODO melo by prijit z modelu
-                        $image_file_path = $base_url . "fotogalerie/obyvatele/3_test_dostal.jpg";
-                        echo "<img src=\"$image_file_path\" class=\"img-fluid\" alt=\"$obyvatel_cele_jmeno_tituly\">";
-                    ?>
-                </div>
-            </div>
-        </div>
-        <!-- konec panel  ZAKLAD 2 -->
-
-        <!-- start panel ZAKLAD 3  -->
-        <div class="tab-pane fade" id="zaklad3" role="tabpanel" aria-labelledby="zaklad3-tab">
-
-            <?php
-                echo "<h2>$obyvatel_cele_jmeno_tituly";
-                echo " <small>(*".$controller->helperFormatDate($obyvatel["datum_narozeni"]).")</small></h2><br/>";
-            ?>
-
-            <div class="card-deck mb-3">
-
-                <div class="card mb-4 box-shadow" style="width: 18rem;">
-                    <?php
-                    // fotka obyvatele - TODO melo by prijit z modelu
-                    $image_file_path = $base_url . "fotogalerie/obyvatele/3_test_dostal.jpg";
-                    echo "<img src=\"$image_file_path\" class=\"card-img-top\" alt=\"$obyvatel_cele_jmeno_tituly\">";
-                    ?>
-
-                    <div class="card-body">
-                        <p class="card-text">Libovolná textová informace</p>
-                    </div>
-                </div>
-
-
-                <div class="card mb-4 box-shadow">
-                    <div class="card-header text-center">
-                        <h4 class="my-0 font-weight-normal">Základní údaje</h4>
-                    </div>
-                    <div class="card-body">
-
-                        <h4 class="card-title">Identifikace</h4>
-
-                        <p class="card-text">
-                        <?php
-                        echo "RČ: $obyvatel[rodne_cislo] <br/>";
-                        echo "Č. poj.: $obyvatel[cislo_pojistence] ($obyvatel[pojistovna_zkratka]) <br/>";
-                        echo "OP: $obyvatel[op]<br/>
-                        <small>(OP platnost do "
-                            .$controller->helperFormatDate($obyvatel["op_platnost_do"])
-                            .")</small><br/>";
-                        ?>
-                        </p>
-
-                        <br/>
-                        <h4 class="card-title">Adresa</h4>
-                        <p class="card-text">
-                        <?php
-                        echo "$obyvatel[adresa_ulice] $obyvatel[adresa_cp]<br/>";
-                        echo "$obyvatel[adresa_mesto]<br/>";
-                        ?>
-                        </p>
-
-                    </div>
-                </div>
-                <div class="card mb-4 box-shadow">
-                    <div class="card-header text-center">
-                        <h4 class="my-0 font-weight-normal">Ostatní</h4>
-                    </div>
-                    <div class="card-body">
-
-                        <?php
-                        echo "místo narození: $obyvatel[misto_narozeni]<br/>";
-                        if (trim($obyvatel["rodne_prijmeni"]) != "") {
-                        // vypsat rodne prijmeni
-                        echo "rozený/á: $obyvatel[rodne_prijmeni]";
-                        }
-                        ?>
-
-                    </div>
-                </div>
-            </div>
-
-
-
-        </div>
-        <!-- konec panel ZAKLAD 3  -->
 
         <!-- start panel UBYTOVANI  -->
         <div class="tab-pane fade" id="ubytovani" role="tabpanel" aria-labelledby="ubytovani-tab">

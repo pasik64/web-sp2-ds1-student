@@ -265,6 +265,10 @@ class obyvatele_controller extends ds1_base_controller
                 $content_params["url_obyvatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "obyvatele_list_all"));
                 $content_params["url_obyvatel_update"]  = $this->makeUrlByRoute($this->route, array("action" => "obyvatel_update_prepare", "obyvatel_id" => $obyvatel_id));
 
+                // konfigurace pro sablonu
+                $template_config = $this->getConfigForPhpTemplate(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatel_detail_config.json", array());
+                $content_params["template_config"] = $template_config;
+
                 $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "obyvatele/templates/admin_obyvatel_detail.inc.php", $content_params, true);
             }
             else {

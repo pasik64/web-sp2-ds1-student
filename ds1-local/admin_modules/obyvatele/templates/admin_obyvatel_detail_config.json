@@ -1,0 +1,49 @@
+{
+  "accordions_list1": {
+      "zakladni_udaje" : {
+          "title": "Základní údaje",
+          "value": "[rodne_cislo] (RČ)",
+          "subaccordions": {
+              "identifikace": {
+                "title": "Identifikace",
+                "value": "[rodne_cislo] (RČ)",
+                "fields" : {
+                  "jmeno": "Jméno",
+                  "prijmeni": "Příjmení",
+                  "rodne_prijmeni": "Rodné příjmení",
+                  "tituly_pred": "Tituly před",
+                  "tituly_za": "Tituly za",
+                  "rodne_cislo": "Rodné číslo",
+                  "op": "Občanský průkaz",
+                  "op_platnost_do": "Občanský průkaz - platnost do"
+                }
+              },
+              "adresa": {
+                "title": "Adresa",
+                "value": "[adresa_ulice] [adresa_cp], [adresa_mesto]",
+                "fields" : {
+                  "adresa_ulice": "Adresa - ulice",
+                  "adresa_cp": "Adresa - čp",
+                  "adresa_mesto": "Adresa - město"
+                }
+              },
+              "vyroci": {
+                "title": "Datum narození",
+                "value": "[datum_narozeni]",
+                "fields" : {
+                  "datum_narozeni": "Datum narození",
+                  "misto_narozeni": "Místo narození"
+                }
+              },
+              "pojistovna": {
+                "title": "Zdravotní pojišťovna",
+                "value": "[pojistovna_zkratka] ([cislo_pojistence])",
+                "fields" : {
+                  "cislo_pojistence": "Číslo pojištěnce",
+                  "pojistovna_zkratka": "Zkratka pojišťovny"
+                }
+              }
+          }
+      }
+  }
+}
