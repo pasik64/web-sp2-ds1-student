@@ -103,7 +103,7 @@
 
                                                         if ($accordion2_value["fields"] != null)
                                                         {
-                                                            echo "<table class='table table-bordered table-sm'>";
+                                                            echo "<table class='table table-sm'>";
 
                                                             foreach ($accordion2_value["fields"] as $field_key => $field_title) {
 
@@ -116,7 +116,7 @@
                                                                     $field_text_db = $obyvatel[$field_key];
                                                                 }
 
-                                                                echo "<tr><th class='w-25'>$field_title</th><td>$field_text_db</td></tr>";
+                                                                echo "<tr><th class='w-50'>$field_title</th><td>$field_text_db</td></tr>";
                                                             }
 
                                                             echo "</table>";

@@ -12,7 +12,7 @@
 /* ************************************************************************************************************ */
 /* vnejsi accordion */
 .obyvatele_detail_accordion1 {}
-.obyvatele_detail_accordion1 .card-header {padding: 0.5rem 1.25rem; background-color: #fff; /* defaultne #f0f3f5 */}
+.obyvatele_detail_accordion1 .card-header {padding: 0.5rem 1.25rem; background-color: #fff; /* defaultne #f0f3f5 */ border: 0px;}
 .obyvatele_detail_accordion1 .card-header a {color: #000; font-size: 16px;}
 
 /* rozbaleny symbol */
@@ -42,8 +42,10 @@
 /* ******************************************************** */
 /* vnitrni accordion = vnoreny  */
 .obyvatele_detail_accordion2 {}
+.obyvatele_detail_accordion2 .card {border-radius: 0px;}
 
 /* rozbaleno */
+.obyvatele_detail_accordion2 .card-header {}
 .obyvatele_detail_accordion2 .card-header a {font-weight: bold;} /* rozkliknute je tucne */
 
 /* jenom pres css zajistuji zobrazeni a skryti informace
@@ -68,7 +70,9 @@
 
 /*defaultni pozadi headeru z bootstrapu, ale acordionem 1 jsem si to prepsal*/
 .obyvatele_detail_accordion2 .card-header {background-color: #f0f3f5; }
+.obyvatele_detail_accordion2 .card-body {padding: 0px;}
 .obyvatele_detail_accordion2 .card-body .table {margin-bottom: 0px; }
+.obyvatele_detail_accordion2 .card-body .table th { padding-left: 50px; }
 
 /* ************************************************************************************************************ */
 /* **************   KONEC   OBYVATELE       ******************************************************************* */
