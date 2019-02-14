@@ -88,6 +88,13 @@
         define("TABLE_UZIVATELSKE_ROLE", "uzivatelske_role");
         define("TABLE_UZIVATELE_PRIDELENI_ROLI", "uzivatele_prideleni_roli");
 
+        // planovani vykonu - admin modul
+        define("TABLE_SLUZBA", "sluzba");
+        define("TABLE_TYP_VYKONU", "typ_vykonu");
+        define("TABLE_PLAN_VYKONU", "plan_vykonu");
+        define("TABLE_ZAZNAM_VYKONU", "zaznam_vykonu");
+        define("TABLE_ZAZNAM_VYKONU_DETAIL", "zaznam_vykonu_detail");
+
     // ****************************************************************************************
     // ***********    KONEC DB      ***********************************************************
     // ****************************************************************************************
