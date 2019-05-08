@@ -353,6 +353,11 @@ class obyvatele_controller extends ds1_base_controller
     }
 
 
+    /**
+     * Metoda pro volani api. Tohle se pouziva pro vyhledavani obyvatel pro autocomplete.
+     * @param Request $request
+     * @return JsonResponse|Response
+     */
     public function apiAction(Request $request)
     {
         // zavolat metodu rodice, ktera provede obecne hlavni kroky a nacte parametry

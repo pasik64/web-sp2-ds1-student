@@ -21,6 +21,7 @@
             <?php
                 // rozsireni
                 $modules_admin = $controller->ds1->getModulesForAdmin();
+                // printr($modules_admin); // tady budou jen moduly typu admin_plugin, api je tady zamerne vyhozeno
 
                 if ($modules_admin != null)
                 foreach ($modules_admin as $admin_module) {

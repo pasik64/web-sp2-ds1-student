@@ -26,6 +26,10 @@
         // cesta k admin modules z admina
         define("DS1_DIR_ADMIN_MODULES_FROM_ADMIN", DS1_PROJECT_ROOT_FROM_ADMIN.DS1_DIR_ROOT_LOCAL."admin_modules/");
 
+        // typy modulu
+        define("DS1_MODULE_TYPE_ADMIN_PLUGIN", "admin_plugin"); // plugin, ktery se zozbrazi v adminovi
+        define("DS1_MODULE_TYPE_ADMIN_API", "admin_api");       // api pro pristup do administrace
+
         // adresar s twigem
         define("DS1_DIR_TEMPLATES_TWIG_LOCAL", DS1_PROJECT_ROOT.DS1_DIR_ROOT_LOCAL."templates_twig/");
         define("DS1_DIR_TEMPLATES_TWIG_CACHE", DS1_PROJECT_ROOT."cache/twig/");
@@ -99,6 +103,16 @@
     // ***********    KONEC DB      ***********************************************************
     // ****************************************************************************************
 
+    // ****************************************************************************************
+    // ***********    START API       *********************************************************
+    // ****************************************************************************************
+
+        // zakladni kontrola pri metodach typu login, aby mi to nekdo nehackoval
+        define("DS1_API_TOKEN", "bAd8swEj6jdsDbeudgehj$0d5*d");
+
+    // ****************************************************************************************
+    // ***********    KONEC API       *********************************************************
+    // ****************************************************************************************
 
     // ****************************************************************************************
     // ***********    START OSTATNI      ******************************************************
