@@ -111,13 +111,13 @@
     // pokud mam vice routes, tak takto:
     $module["routes"]["test"] = array(
         "route_name" => "api_obyvatele_test",
-        "route_path" => "/api/api_obyvatele_test",
+        "route_path" => "/api/api_obyvatele/test",
         "controller_name" => "api_obyvatele_controller",
         "controller_action" => "apiTestAction"
     );
     $module["routes"]["index_action"] = array(
                                                 "route_name" => "api_obyvatele_index_action",
-                                                "route_path" => "/api/api_obyvatele_index_action",
+                                                "route_path" => "/api/api_obyvatele/index_action",
                                                 "controller_name" => "api_obyvatele_controller",
                                                 "controller_action" => "apiIndexAction"
                                             );
