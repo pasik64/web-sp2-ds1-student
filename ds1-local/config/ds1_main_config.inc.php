@@ -86,18 +86,18 @@
 
 
         // dodatky pro modul dokumentace
-        define("TABLE_DOKUMENTACE", "dokumentace");
-        define("TABLE_DOKUMENTACE_DRUH_ZAPISU", "dokumentace_druh_zapisu");
-        define("TABLE_DRUH_ZAPISU_UZIVATELSKE_ROLE", "druh_zapisu_uzivatelske_role");
-        define("TABLE_UZIVATELSKE_ROLE", "uzivatelske_role");
-        define("TABLE_UZIVATELE_PRIDELENI_ROLI", "uzivatele_prideleni_roli");
+        define("TABLE_DOKUMENTACE", TABLE_PREFIX."dokumentace");
+        define("TABLE_DOKUMENTACE_DRUH_ZAPISU", TABLE_PREFIX."dokumentace_druh_zapisu");
+        define("TABLE_DRUH_ZAPISU_UZIVATELSKE_ROLE", TABLE_PREFIX."druh_zapisu_uzivatelske_role");
+        define("TABLE_UZIVATELSKE_ROLE", TABLE_PREFIX."uzivatelske_role");
+        define("TABLE_UZIVATELE_PRIDELENI_ROLI", TABLE_PREFIX."uzivatele_prideleni_roli");
 
         // planovani vykonu - admin modul
-        define("TABLE_SLUZBA", "sluzba");
-        define("TABLE_TYP_VYKONU", "typ_vykonu");
-        define("TABLE_PLAN_VYKONU", "plan_vykonu");
-        define("TABLE_ZAZNAM_VYKONU", "zaznam_vykonu");
-        define("TABLE_ZAZNAM_VYKONU_DETAIL", "zaznam_vykonu_detail");
+        define("TABLE_SLUZBA", TABLE_PREFIX."sluzba");
+        define("TABLE_TYP_VYKONU", TABLE_PREFIX."typ_vykonu");
+        define("TABLE_PLAN_VYKONU", TABLE_PREFIX."plan_vykonu");
+        define("TABLE_ZAZNAM_VYKONU", TABLE_PREFIX."zaznam_vykonu");
+        define("TABLE_ZAZNAM_VYKONU_DETAIL", TABLE_PREFIX."zaznam_vykonu_detail");
 
     // ****************************************************************************************
     // ***********    KONEC DB      ***********************************************************

@@ -66,7 +66,6 @@
     // ************************************************************************************
     // **************   Modul správa uživatelů ***********************************************
 
-
     // novy modul
     $module = array();
     $module["name"] = "sprava_uzivatelu";
@@ -75,7 +74,7 @@
     $module["route_name"] = "sprava_uzivatelu";
     $module["route_path"] = "/plugin/$module[name]";
     $module["route"] = array("controller_name" => "sprava_uzivatelu_controller", "controller_action" => "indexAction");
-    
+
     // pridat modul
     $modules_admin[] = $module;
 
