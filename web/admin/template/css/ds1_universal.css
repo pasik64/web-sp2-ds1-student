@@ -5,7 +5,15 @@
     box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, .05);
 }
 
+/* kdykoliv chci na radku nebo bunce dat najevo moznost kliknout a jinak se to nepozna = jen kurzor */
+.klikatelne {
+    cursor: pointer;
+}
 
+/* pro nastavovani viditelnosti u acordionu */
+.only-collapsed { display: none; }
+.collapsed .only-collapsed { display: inline; }
+.collapsed .only-expanded { display: none; }
 
 /* ************************************************************************************************************ */
 /* **************    OBYVATELE       ************************************************************************** */
@@ -13,7 +21,7 @@
 /* vnejsi accordion */
 .obyvatele_detail_accordion1 {}
 .obyvatele_detail_accordion1 .card-header {padding: 0.5rem 1.25rem; background-color: #fff; /* defaultne #f0f3f5 */ border: 0px;}
-.obyvatele_detail_accordion1 .card-header a {color: #000; font-size: 16px;}
+.obyvatele_detail_accordion1 .card-header a {color: #000; font-size: 16px; text-decoration: none;}
 
 /* rozbaleny symbol */
 .obyvatele_detail_accordion1 .card-header a:before {
@@ -35,7 +43,15 @@
 .obyvatele_detail_accordion1 .card-header a.collapsed:before {content: "\f106";}
 
 /* vlastni modry text v hlavicce acordionu, v divu, jinak nejde nastavit width */
-.obyvatele_detail_accordion1 .card-header .accordion_header_value {float: right; width: 80%; text-align: center; padding-right: 50px; color: #5fb2da; font-size: 14px;}
+.obyvatele_detail_accordion1 .card-header .accordion_header_value {
+    float: right;
+    width: 80%;
+    text-align: center;
+    /*padding-right: 50px;*/
+    color: #5fb2da;
+    font-size: 14px;
+}
+
 
 .obyvatele_detail_accordion1 .card-body {padding: 0.25rem; }
 

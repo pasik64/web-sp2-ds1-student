@@ -99,13 +99,23 @@
             if ($obyvatele_list != null) {
                 //printr($users_list); exit;
 
+
+                // JS podpora pro klikatelny radek nez najdu lepsi reseni:
+                echo "<script>
+                        jQuery(document).ready(function($) {
+                            $(\".clickable-row\").click(function() {
+                                window.location = $(this).data(\"href\");
+                            });
+                        });
+                        </script>";
+
                 // table-sm - zmensi odsazeni bunek
                 echo "<table class='table table-sm table-bordered table-striped table-hover'>";
+
+                    // <th>pokoj</th>
                 echo "<tr>
-                                    <th>#</th>
                                     <th>příjmení</th>
-                                    <th>jméno</th>
-                                    <th>pokoj</th>
+                                    <th>jméno</th> 
                                     <th>věk</th>
                                     <th>datum narození</th>
                                     <th>zkratka pojišťovny</th>
@@ -126,7 +136,7 @@
                     $route_params["obyvatel_id"] = $obyvatel["id"];
                     $url_update_prepare = $this->makeUrlByRoute($route, $route_params);
 
-                    // url na detail pokoje
+                    // url na detail pokoje - docasne vypnuto
                     $pokoj_nazev_pom = "";
 
                     if (isset($obyvatel["pokoj"]["id"])) {
@@ -140,29 +150,30 @@
                         $pokoj_nazev_pom = $obyvatel["pokoj_nazev"];
                     }
 
+                    // klikatelny radek pres class a JS vyse, pres class stretched-link to nejde
+                    echo "<tr class='clickable-row klikatelne' data-href='$url_detail'>";
 
-                    echo "<tr>";
+                        //echo "<td>$obyvatel[id]</td>";
 
-                    echo "<td>$obyvatel[id]</td>";
-                    echo "<td>$obyvatel[prijmeni]</td>";
-                    echo "<td>$obyvatel[jmeno]</td>";
-                    echo "<td>$pokoj_nazev_pom</td>";
+                        echo "<td>$obyvatel[prijmeni]</td>";
+                        echo "<td>$obyvatel[jmeno]</td>";
+                        //echo "<td>$pokoj_nazev_pom</td>";
 
-                    // vek
-                    if (isset($obyvatel["vek"])) {
-                        echo "<td>$obyvatel[vek]</td>";
-                    }
-                    else echo "<td>&nbsp;</td>"; // index vek neni k dispozici
+                        // vek
+                        if (isset($obyvatel["vek"])) {
+                            echo "<td>$obyvatel[vek]</td>";
+                        }
+                        else echo "<td>&nbsp;</td>"; // index vek neni k dispozici
 
-                    // toto mi prevede datum do spravneho formatu pro CR
-                    echo "<td>".$controller->helperFormatDate($obyvatel["datum_narozeni"])."</td>";
-                    echo "<td>$obyvatel[pojistovna_zkratka]</td>";
-                    echo "<td>".$controller->helperFormatDate($obyvatel["op_platnost_do"])."</td>";
-                    echo "<td>
-                                  <a href=\"$url_detail\" class='btn btn-primary btn-sm'><i class=\"icon-layers\"></i></a>
-                                  &nbsp;&nbsp;
-                                  <a href=\"$url_update_prepare\" class='btn btn-primary btn-sm'><i class=\"icon-pencil\"></i></a>
-                              </td>";
+                        // toto mi prevede datum do spravneho formatu pro CR
+                        echo "<td>".$controller->helperFormatDate($obyvatel["datum_narozeni"])."</td>";
+                        echo "<td>$obyvatel[pojistovna_zkratka]</td>";
+                        echo "<td>".$controller->helperFormatDate($obyvatel["op_platnost_do"])."</td>";
+                        echo "<td>
+                                      <a href=\"$url_detail\" class='btn btn-primary btn-sm'><i class=\"icon-layers\"></i></a>
+                                      &nbsp;&nbsp;
+                                      <a href=\"$url_update_prepare\" class='btn btn-primary btn-sm'><i class=\"icon-pencil\"></i></a>
+                                  </td>";
 
                     echo "</tr>";
                 }

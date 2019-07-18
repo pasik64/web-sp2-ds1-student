@@ -1,28 +1,42 @@
 <?php
 /**
- *   Detail obyvatele
+ *   Detail obyvatele $obyvatel_id
  */
 
     // definice, ktera pole jsou datumy
     $dates_text_columns_keys = array();
     $dates_text_columns_keys[] = "datum_narozeni";
     $dates_text_columns_keys[] = "op_platnost_do";
+
+    // slozit cele jmeno obyvatele s tituly
+    $obyvatel_cele_jmeno_tituly = "";
+
+    if (trim($obyvatel["tituly_pred"]) != "") $obyvatel_cele_jmeno_tituly = trim($obyvatel["tituly_pred"])." ";
+    $obyvatel_cele_jmeno_tituly .= trim($obyvatel["jmeno"])." ";
+    $obyvatel_cele_jmeno_tituly .= trim($obyvatel["prijmeni"]);
+    if (trim($obyvatel["tituly_za"]) != "") $obyvatel_cele_jmeno_tituly .= ", ".trim($obyvatel["tituly_za"]); // tituly za se oddeluji carkou od jmena
+
 ?>
 <div class="container-fluid">
-    <?php
-        echo "<h3>Detail obyvatele #$obyvatel_id - $obyvatel[jmeno] $obyvatel[prijmeni] ("
-            . $controller->helperFormatDate($obyvatel["datum_narozeni"])
-            . ")</h3><br/>";
 
+    <div class="row">
+        <div class="col-md-3">
+            <?php
+            echo "<h3>$obyvatel[jmeno] $obyvatel[prijmeni]<br/> ("
+                . $controller->helperFormatDate($obyvatel["datum_narozeni"])
+                . ")</h3><br/>";
+            ?>
+        </div>
+        <div class="col-md-1">
+            <?php
+                // fotka obyvatele - TODO melo by prijit z modelu
+                $image_file_path = $base_url . "fotogalerie/obyvatele/3_test_dostal.jpg";
+                echo "<img src=\"$image_file_path\" class=\"img-fluid\" alt=\"$obyvatel_cele_jmeno_tituly\" style='max-width: 100px;'>";
+            ?>
+        </div>
 
-        // slozit cele jmeno obyvatele s tituly
-        $obyvatel_cele_jmeno_tituly = "";
+    </div>
 
-        if (trim($obyvatel["tituly_pred"]) != "") $obyvatel_cele_jmeno_tituly = trim($obyvatel["tituly_pred"])." ";
-        $obyvatel_cele_jmeno_tituly .= trim($obyvatel["jmeno"])." ";
-        $obyvatel_cele_jmeno_tituly .= trim($obyvatel["prijmeni"]);
-        if (trim($obyvatel["tituly_za"]) != "") $obyvatel_cele_jmeno_tituly .= ", ".trim($obyvatel["tituly_za"]); // tituly za se oddeluji carkou od jmena
-    ?>
     <div class="pull-right">
         <a href="<?php echo $url_obyvatele_list;?>" class="btn btn-default">Zpět na seznam obyvatel</a>
     </div>
@@ -30,6 +44,7 @@
     <!-- start seznam zalozek  -->
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
+            <!-- class stretched-link roztahne link na celeho rodice, aby byl klikatelny -->
             <a class="nav-link active" id="zaklad-tab" data-toggle="tab" href="#zaklad" role="tab" aria-controls="zaklad" aria-selected="true">Základní údaje</a>
         </li>
         <li class="nav-item">
@@ -43,6 +58,16 @@
 
     <!-- start panely pro zalozky  -->
     <div class="tab-content" id="myTabContent">
+
+        <!-- JS podpora pro klikatelny radek nez najdu lepsi reseni - zabalovani a rozbalovani zalozek mozna -->
+        <script>
+            jQuery(document).ready(function($) {
+                $(".clickable-row").click(function() {
+                window.location = $(this).data("href");
+                });
+            });
+        </script>
+
 
         <!-- start panel ZAKLAD  -->
         <div class="tab-pane fade show active" id="zaklad" role="tabpanel" aria-labelledby="zaklad-tab">
@@ -62,10 +87,12 @@
 
                                     echo "<div id='$accordion1_id' role='tablist' class='obyvatele_detail_accordion1'>
                                             <div class='card mb-0'>
-                                                <div class='card-header' role='tab'>
-                                                    <h5 class='mb-0'>
+                                                <!-- klikatelny cely radek - jen pridat data-toggle=\"collapse\" data-target=\"#collapse_$accordion1_id\" -->
+                                                <div class='card-header klikatelne' role='tab' data-toggle=\"collapse\" data-target=\"#collapse_$accordion1_id\">
+                                                     <h5 class='mb-0' >
+                                                        <!-- tento odkaz tady potreuji jednak pro jistotu a jednak kuli css - pridani sipky na konec radku-->
                                                         <a data-toggle=\"collapse\" href=\"#collapse_$accordion1_id\">
-                                                                $accordion1_value[title] &nbsp; <div class=\"accordion_header_value\">$accordion_header_text</div>
+                                                                $accordion1_value[title] &nbsp; <div class=\"accordion_header_value only-collapsed\">$accordion_header_text</div>
                                                         </a>
                                                     </h5>
                                                 </div><!-- card-header -->";
@@ -88,11 +115,11 @@
 
                                             echo "<div id='$accordion2_id' role='tablist' class='obyvatele_detail_accordion2'>
                                             <div class='card mb-0'>
-                                                <div class='card-header' role='tab'>
+                                                <div class='card-header klikatelne' role='tab' data-toggle=\"collapse\" data-target=\"#collapse_$accordion2_id\">
                                                     <h5 class='mb-0'>
                                                         <!-- prihodi se class collapsed, pokud je to zabalene-->
                                                         <a data-toggle=\"collapse\" href=\"#collapse_$accordion2_id\" class='collapsed'>
-                                                                $accordion2_value[title] &nbsp; <div class=\"accordion_header_value\">$accordion_header_text2</div>
+                                                                $accordion2_value[title] &nbsp; <div class=\"accordion_header_value only-collapsed\">$accordion_header_text2</div>
                                                         </a>
                                                     </h5>
                                                 </div><!-- card-header -->";
@@ -149,7 +176,7 @@
                     <!-- POBYT  START  -->
                     <div id="accordion_pobyt" role="tablist" class='obyvatele_detail_accordion1'>
                         <div class="card mb-0">
-                            <div class="card-header" id="pobyt_headingOne" role="tab">
+                            <div class="card-header klikatelne" id="pobyt_headingOne" role="tab" data-toggle="collapse" data-target="#pobyt_collapseOne">
                                 <h5 class="mb-0">
 
                                     <?php
@@ -170,7 +197,7 @@
 
                                     <a data-toggle="collapse" href="#pobyt_collapseOne" class="collapsed">
                                         Pobyt
-                                        <div class="accordion_header_value">
+                                        <div class="accordion_header_value only-collapsed">
                                             <?php echo $aktualni_ubytovani_pokoj." <small>(od ".$controller->helperFormatDateAuto($aktualni_ubytovani_datum_od).")</small>"; ?>
                                         </div>
                                     </a>
@@ -182,7 +209,7 @@
                                     //printr($obyvatel_na_pokojich);
                                     if ($obyvatel_na_pokojich != null){
                                         echo "<table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>";
-                                        echo "<tr><th>Datum od</th><th>Datum do</th><th>Název pokoje</th><th>Poschodí</th><th>Pokoj ID (#)</th></tr>";
+                                        echo "<tr><th>Datum od</th><th>Datum do</th><th>Název pokoje</th><th>Poschodí</th></tr>";
 
                                         foreach ($obyvatel_na_pokojich as $ubytovani) {
 
@@ -197,7 +224,6 @@
                                             echo "<td>".$controller->helperFormatDateAuto($ubytovani["datum_do"])."</td>";
                                             echo "<td><a href='$url_pokoj_detail'>$ubytovani[pokoj_nazev]</a></td>";
                                             echo "<td>$ubytovani[pokoj_poschodi]</td>";
-                                            echo "<td>$ubytovani[pokoj_id]</td>";
                                             echo "</tr>";
                                         }
                                         echo "</table>";
@@ -220,7 +246,8 @@
 
                     <div id="accordion_klicovy_zamestnanec" role="tablist"  class='obyvatele_detail_accordion1'>
                         <div class="card mb-0">
-                            <div class="card-header" id="klicovy_zamestnanec_headingOne" role="tab">
+                            <!-- je to klikatelne uz primo pres ten header = zabalit a rozbalit -->
+                            <div class="card-header klikatelne" id="klicovy_zamestnanec_headingOne" role="tab" data-toggle="collapse" href="#klicovy_collapseOne">
                                 <h5 class="mb-0">
                                     <a data-toggle="collapse" href="#klicovy_collapseOne" class="collapsed" style="color: #000; font-size: 16px;">
                                         Klíčový zaměstnanec
@@ -256,14 +283,13 @@
 
                     <br/><br/><br/>
 
-<?php
+    <?php
         // konfigurace sablony
-        echo "<h2>Konfigurace výpisu v .jsonu</h2>";
-        printr($template_config);
+        //echo "<h2>Konfigurace výpisu v .jsonu</h2>";
+        //printr($template_config);
 
-
-
-// AUTOMATICKY VYPIS VSEHO
+        /*
+        // AUTOMATICKY VYPIS VSEHO pro testovani
                                 // pro tabulkovy vypis
                                 $text_columns = array();
                                 $text_columns["jmeno"] = "Jméno";
@@ -322,25 +348,23 @@
 
                                     echo "</table>";
                                 }
-                                ?>
+            */
+
+    ?>
+
                 </div>
+
+                <!-- SLOUPEC VLEVO - napr pro tlacitka -->
                 <div class="col-md-2">
-                                <?php
-                                // fotka obyvatele - TODO melo by prijit z modelu
-                                $image_file_path = $base_url . "fotogalerie/obyvatele/3_test_dostal.jpg";
-                                echo "<img src=\"$image_file_path\" class=\"img-fluid\" alt=\"$obyvatel_cele_jmeno_tituly\">";
-                                ?>
-                                Poznámka: jen ilustrační foto. Fotky jsme ještě nenapojili.
+                            <!-- TLACITKA -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                        <a href="<?php echo $url_obyvatel_update;?>" class="btn btn-primary"><i class="icon-pencil"></i> Upravit</a>
+                                </div>
+                            </div>
                 </div>
             </div><!-- konec row -->
 
-            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="pull-left">
-                                        <a href="<?php echo $url_obyvatel_update;?>" class="btn btn-primary btn-sm"><i class="icon-pencil"></i> Upravit</a>
-                                    </div>
-                                </div>
-            </div>
             </div>
         </div>
         <!-- konec panel ZAKLAD  -->
@@ -354,7 +378,7 @@
                 //printr($obyvatel_na_pokojich);
                 if ($obyvatel_na_pokojich != null){
                     echo "<table class='table table-sm table-striped table-bordered' style='max-width: 500px;'>";
-                        echo "<tr><th>Datum od</th><th>Datum do</th><th>Název pokoje</th><th>Poschodí</th><th>Pokoj ID (#)</th></tr>";
+                        echo "<tr><th>Datum od</th><th>Datum do</th><th>Název pokoje</th><th>Poschodí</th></tr>";
 
                     foreach ($obyvatel_na_pokojich as $ubytovani) {
 
@@ -369,7 +393,6 @@
                             echo "<td>".$controller->helperFormatDateAuto($ubytovani["datum_do"])."</td>";
                             echo "<td><a href='$url_pokoj_detail'>$ubytovani[pokoj_nazev]</a></td>";
                             echo "<td>$ubytovani[pokoj_poschodi]</td>";
-                            echo "<td>$ubytovani[pokoj_id]</td>";
                         echo "</tr>";
                     }
                     echo "</table>";
