@@ -21,6 +21,12 @@ class sprava_uzivatelu extends ds1_base_model
         return $uzivatel_data;
     }
 
+    public function getUzivatelskeRole() {
+        $where_array = array();
+        $rows = $this->DBSelectAll("ds1_uzivatelske_role", "*", $where_array, "", "asc");
+        return $rows;
+    }
+
     /**
      * Metoda vrátí z DB řádek obsahující informace o roli požadovaného uživatele - POZOR: jen 1 role na uzivatele
      * @param $id_uzivatel id požadovaného uživatele v tabulce uživatelů

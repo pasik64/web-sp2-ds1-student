@@ -61,7 +61,7 @@ class sprava_uzivatelu_controller extends ds1_base_controller
 
 
             $content_params["form_submit_url"] = $this->makeUrlByRoute($this->route);
-            $content_params["role_edit"] = "admin_users_add_role";
+            $content_params["role_edit"] = "admin_users_edit_role";
             //pokud přihlášený admin, pak pokračuji...
 
             //pokud nemám specifikované příjmení, pak zobrazím všechny uživatele systému
@@ -97,12 +97,12 @@ class sprava_uzivatelu_controller extends ds1_base_controller
                 $uzivatel_data["role_data"] = $dokumentace_pacient -> getRoleUzivatelByIDUzivatel($uzivatel_data["id"]);
             }*/
             $content_params["uzivatele_info"] = $data_uzivatelu;
-            $content_params["url_pridat_role"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_add_role")); //odkaz na přidání role
+            $content_params["url_pridat_role"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_edit_role")); //odkaz na přidání role
             $uzivatele = $sprava_uzivatelu -> getVsechnaPrijmeniUzivatele(); //všechna příjmení uživatelů
             $content_params["napoveda_prijmeni_uzivatelu"] = $uzivatele;
             $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_admin_list.inc.php", $content_params, true);
         }
-        else if($action == "admin_users_add_role")
+        else if($action == "admin_users_edit_role")
         {
             if ($prihlaseny_uzivatel_udaje["login"] != "admin"){ //pokud není přihlášený admin, tak ho přesměruji
                 $admin_url =  $this->makeUrlByRoute($this->route, array("action" => "normal_user_no_access"));
@@ -242,7 +242,7 @@ class sprava_uzivatelu_controller extends ds1_base_controller
 
             $sprava_uzivatelu -> saveAdminPridelRoleDB($uzivatel_id, $nova_role_id);
             $content_params["url_uzivatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_list_all"));
-            $content_params["url_dalsi_zaznam"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_add_role"));
+            $content_params["url_dalsi_zaznam"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_edit_role"));
             $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_add_edit_result.inc.php", $content_params, true);
         }
         else if($action == "error_admin_prideleni")

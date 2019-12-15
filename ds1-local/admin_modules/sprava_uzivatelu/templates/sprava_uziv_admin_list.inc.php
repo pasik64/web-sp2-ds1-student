@@ -35,8 +35,7 @@
                                     <th>příjmení</th>
                                     <th>telefon</th>
                                     <th>email</th>
-                                    <th>role</th>
-                                    <th>upravit roli</th>
+                                    <th>správa rolí</th>
                                 </tr>";
                     foreach($uzivatele_info as $uzivatel_info){
                         echo "<tr>";
@@ -46,9 +45,6 @@
                         echo "<td>$uzivatel_info[prijmeni]</td>";
                         echo "<td>$uzivatel_info[telefon]</td>";
                         echo "<td>$uzivatel_info[email]</td>";
-
-                        $data_role = $uzivatel_info["role_data"];
-                        echo "<td>$data_role[nazev]</td>";
 
                         // detail dokumentace
                         $route_params = array();
