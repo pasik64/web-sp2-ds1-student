@@ -133,15 +133,28 @@ class sprava_uzivatelu_controller extends ds1_base_controller
             //vytvořím nápovědu pro role
             $where_array = array();
             $limit_pom = "";
-            $vsechny_mozne_role = $sprava_uzivatelu->DBSelectAll(TABLE_UZIVATELSKE_ROLE, "nazev", $where_array, $limit_pom, "");
+            $vsechny_mozne_role = $sprava_uzivatelu->DBSelectAll(TABLE_UZIVATELSKE_ROLE, "nazev,id", $where_array, $limit_pom, "");
             //před předáním do template odstraním pole v poli (chci jen názvy rolí)
-            $vsechny_mozne_role_edit = array();
+            $vsechny_zbyle_role = array();
+
+            $uzivatel = $sprava_uzivatelu -> getUzivatelByLogin($uzivatel_login);
+            $role_uzivatele = $sprava_uzivatelu -> getRoleUzivatelByIDUzivatel($uzivatel["id"]);
+            $content_params["vsechny_role_uzivatele"] = $role_uzivatele;
+
 
             foreach ($vsechny_mozne_role as $role){
-                array_push($vsechny_mozne_role_edit, $role["nazev"]);
+                $contains = false;
+                foreach ($role_uzivatele as $uzivatel_role) {
+                    if ($role["id"] == $uzivatel_role["id"]) {
+                        $contains = true;
+                    }
+                }
+                if (!$contains) {
+                    array_push($vsechny_zbyle_role, $role);
+                }
             }
 
-            $content_params["vsechny_role"] = $vsechny_mozne_role_edit;
+            $content_params["vsechny_zbyle_role"] = $vsechny_zbyle_role;
             $content_params["url_uzivatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_list_all")); //odkaz na seznam všech uživatelů
 
             //udělám si seznam všech příjmení uživatelů (pro nápovědu při vyhledávání)
@@ -156,69 +169,70 @@ class sprava_uzivatelu_controller extends ds1_base_controller
             }
 
             // nacist zadana data
-            $role_zadano = $this->loadRequestParam($request, "zadano", "post", null);
+            $login_zadano = $this->loadRequestParam($request, "zadanyLogin", "post", null);
+            $role_zadano = $this->loadRequestParam($request, "zadanaRole", "post", null);
+            var_dump($_POST);
 
             //zjistím si, jestli existuje daný uživatel a role
-            $uzivatel = $sprava_uzivatelu -> getUzivatelByLogin($role_zadano["login"]);
+            $uzivatel = $sprava_uzivatelu -> getUzivatelByLogin($login_zadano);
 
-            $role = $sprava_uzivatelu -> getRoleIDByNazevRole($role_zadano["role"]);
+            $vsechny_zadane_role = array();
 
-            if($role == NULL && $uzivatel == NULL){ //pokud neexistuje role ani uživatel
-                $error_url =  $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
-                $_SESSION["error_text"] = "CHYBA! V DB není definována zvolená role, ani zvolený uživatel - příště vybírejte z nabízených možností.";
-                header("Location: $error_url");
-                exit();
-            }else if($role == NULL){ //pokud neexistuje role
-                $error_url =  $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
-                $_SESSION["error_text"] = "CHYBA! V DB není definována zvolená role - příště vybírejte z nabízených možností.";
-                header("Location: $error_url");
-                exit();
-            }else if($uzivatel == NULL){ //pokud neexistuje uživatel
-                $_SESSION["error_text"] = "CHYBA! V DB není definován zvolený uživatel - příště vybírejte z nabízených možností.";
-                $error_url =  $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
-                header("Location: $error_url");
-                exit();
+            foreach ($role_zadano as $role){
+
+                if($role == NULL && $uzivatel == NULL){ //pokud neexistuje role ani uživatel
+                    $error_url =  $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
+                    $_SESSION["error_text"] = "CHYBA! V DB není definována zvolená role, ani zvolený uživatel - příště vybírejte z nabízených možností.";
+                    header("Location: $error_url");
+                    exit();
+                }else if($role == NULL){ //pokud neexistuje role
+                    $error_url =  $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
+                    $_SESSION["error_text"] = "CHYBA! V DB není definována zvolená role - příště vybírejte z nabízených možností.";
+//                header("Location: $error_url");
+                    exit();
+                }else if($uzivatel == NULL){ //pokud neexistuje uživatel
+                    $_SESSION["error_text"] = "CHYBA! V DB není definován zvolený uživatel - příště vybírejte z nabízených možností.";
+                    $error_url =  $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
+                    header("Location: $error_url");
+                    exit();
+                }
+                array_push($vsechny_zadane_role, $role);
             }
 
             //načtu si údaj z DB týkající se daného uživatele
             $where_array = array();
-            $where_array[] = $sprava_uzivatelu->DBHelperGetWhereItem("login", $role_zadano["login"]);
+            $where_array[] = $sprava_uzivatelu->DBHelperGetWhereItem("login", $login_zadano);
             $limit_pom = "limit 1";
             $uzivatel_data = $sprava_uzivatelu->DBSelectOne(TABLE_USERS_ADMIN, "*", $where_array, $limit_pom);
 
             //přidám data, která chci zobrazit (kromě základních informací z tabulky uživatelů)
 
-            $soucasna_role_pred_zmenou = $sprava_uzivatelu -> getRoleUzivatelByIDUzivatel($uzivatel_data["id"]);
+            $soucasne_role_pred_zmenou = $sprava_uzivatelu -> getRoleUzivatelByIDUzivatel($uzivatel_data["id"]);
 
-            $uzivatel_data["predchozi_role"] = $soucasna_role_pred_zmenou["nazev"];
-            $prava_zobrazeni_predchozi_role = $sprava_uzivatelu -> getDruhyZapisuPristupByNazevRole($soucasna_role_pred_zmenou["nazev"]);
-            //pro správnou funkci v templatu potřebujeme souvislý string = vytvořím ho
-            $prava_zobrazeni_predchozi_role_string = "";
-            for($i = 0; $i < sizeof($prava_zobrazeni_predchozi_role); $i++){
-                if($i != (sizeof($prava_zobrazeni_predchozi_role) - 1)){ //pokud nejsem u posledního prvku pole, pak přidám ","
-                    $prava_zobrazeni_predchozi_role_string = $prava_zobrazeni_predchozi_role_string.$prava_zobrazeni_predchozi_role[$i]["nazev"].", ";
+            $soucasne_role_string = "";
+            for($i = 0; $i < sizeof($soucasne_role_pred_zmenou); $i++){
+                if($i != (sizeof($soucasne_role_pred_zmenou) - 1)){ //pokud nejsem u posledního prvku pole, pak přidám ","
+                    $soucasne_role_string = $soucasne_role_string.$soucasne_role_pred_zmenou[$i]["nazev"].", ";
                 }else{
-                    $prava_zobrazeni_predchozi_role_string = $prava_zobrazeni_predchozi_role_string.$prava_zobrazeni_predchozi_role[$i]["nazev"];
+                    $soucasne_role_string = $soucasne_role_string.$soucasne_role_pred_zmenou[$i]["nazev"];
                 }
             }
-            $uzivatel_data["predchozi_role_typy"] = $prava_zobrazeni_predchozi_role_string;
+            $uzivatel_data["predchozi_role"] = $soucasne_role_string;
 
-            $uzivatel_data["nova_role"] = $role_zadano["role"];
-            $uzivatel_data["nova_role_id"] = $sprava_uzivatelu -> getRoleIDByNazevRole($role_zadano["role"]);
-
-            $prava_zobrazeni = $sprava_uzivatelu -> getDruhyZapisuPristupByNazevRole($role_zadano["role"]);
-            //pro práci v templatu potřebuji souvislý string = převedu
-            $prava_zobrazeni_string = "";
-
-            for($i = 0; $i < sizeof($prava_zobrazeni); $i++){
-                if($i != (sizeof($prava_zobrazeni) - 1)){ //pokud nejsem u posledního prvku pole, pak přidám ","
-                    $prava_zobrazeni_string = $prava_zobrazeni_string.$prava_zobrazeni[$i]["nazev"].", ";
+            $nove_role_string = "";
+            for($i = 0; $i < sizeof($vsechny_zadane_role); $i++){
+                $nazev_role = $sprava_uzivatelu -> getRoleNazevByIdRole($vsechny_zadane_role[$i]);
+                if($i != (sizeof($vsechny_zadane_role) - 1)){ //pokud nejsem u posledního prvku pole, pak přidám ","
+                    $nove_role_string = $nove_role_string.$nazev_role.", ";
                 }else{
-                    $prava_zobrazeni_string = $prava_zobrazeni_string.$prava_zobrazeni[$i]["nazev"];
+                    $nove_role_string = $nove_role_string.$nazev_role;
                 }
             }
 
-            $uzivatel_data["nova_role_typy"] = $prava_zobrazeni_string;
+
+            $uzivatel_data["nova_role"] = $nove_role_string;
+
+            $uzivatel_data["nove_role_id"] = $vsechny_zadane_role;
 
             //printr($uzivatel_data);exit;
             //pokud neexsituje, pak error vypíšu
@@ -238,9 +252,10 @@ class sprava_uzivatelu_controller extends ds1_base_controller
 
             //vytáhnu si data ze session (v předchozím templatu uložena) a uložím je do DB
             $uzivatel_id = $_SESSION["uzivatel_id"];
-            $nova_role_id = $_SESSION["nova_role_id"];
+            $nove_role_id = $_SESSION["nove_role_id"];
 
-            $sprava_uzivatelu -> saveAdminPridelRoleDB($uzivatel_id, $nova_role_id);
+
+            $sprava_uzivatelu -> saveAdminPridelRoleDB($uzivatel_id, $nove_role_id);
             $content_params["url_uzivatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_list_all"));
             $content_params["url_dalsi_zaznam"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_edit_role"));
             $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_add_edit_result.inc.php", $content_params, true);

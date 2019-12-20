@@ -28,7 +28,7 @@ class sprava_uzivatelu extends ds1_base_model
     }
 
     /**
-     * Metoda vrátí z DB řádek obsahující informace o roli požadovaného uživatele - POZOR: jen 1 role na uzivatele
+     * Metoda vrátí z DB řádek obsahující informace o rolích požadovaného uživatele
      * @param $id_uzivatel id požadovaného uživatele v tabulce uživatelů
      * @return mixed řádek z DB obsahující informace o roli požadovaného uživatele
      */
@@ -42,14 +42,21 @@ class sprava_uzivatelu extends ds1_base_model
         $table_name = TABLE_UZIVATELE_PRIDELENI_ROLI;
         $where_array = array();
         $where_array[] = $this->DBHelperGetWhereItem("uzivatele_id", $uzivatel_data["id"]);
-        $limit_pom = "limit 1";
-        $prideleni_roli_data = $this->DBSelectOne($table_name, "*", $where_array, $limit_pom);
+        $limit_pom = "";
+        $prideleni_roli_data = $this->DBSelectAll($table_name, "*", $where_array, $limit_pom);
 
         $table_name = TABLE_UZIVATELSKE_ROLE;
-        $where_array = array();
-        $where_array[] = $this->DBHelperGetWhereItem("id", $prideleni_roli_data["uzivatele_role_id"]);
-        $limit_pom = "limit 1";
-        $konkretni_role_data = $this->DBSelectOne($table_name, "*", $where_array, $limit_pom);
+
+        $konkretni_role_data = array();
+        foreach ($prideleni_roli_data as $role_data) {
+            if ($role_data["uzivatele_role_id"] != "-1") {
+                $where_array = array();
+                $where_array[] = $this->DBHelperGetWhereItem("id", $role_data["uzivatele_role_id"]);
+                $limit_pom = "limit 1";
+                $data = $this->DBSelectOne($table_name, "*", $where_array, $limit_pom);
+                array_push($konkretni_role_data, $data);
+            }
+        }
 
         return $konkretni_role_data;
     }
@@ -87,8 +94,7 @@ class sprava_uzivatelu extends ds1_base_model
     /**
      * Funkce přidělí uživateli s předaným id novou roli (také specifikovanou id)
      * @param $uzivatel_id id uživatele, kterému chceme přidat / upravit roli
-     * @param $role_id id nové role, kterou chceme uživateli přidělit
-     * @return int informace přidané do databáze
+     * @param $role_id id nové role, které chceme uživateli přidělit
      */
     public function saveAdminPridelRoleDB($uzivatel_id, $role_id){
         //nejdříve si zjistím, jestli uživatel již má přidělenou nějakou roli
@@ -96,8 +102,7 @@ class sprava_uzivatelu extends ds1_base_model
 
         $where_array = array();
         $where_array[] = $this->DBHelperGetWhereItem("uzivatele_id", $uzivatel_id);
-        $limit_pom = "limit 1";
-        $id_role = $this->DBSelectAll(TABLE_UZIVATELE_PRIDELENI_ROLI, "*", $where_array, $limit_pom);
+        $id_role = $this->DBSelectAll(TABLE_UZIVATELE_PRIDELENI_ROLI, "*", $where_array, "");
 
         if(sizeof($id_role) > 0){
             $predchozi_role_existuje = true;
@@ -106,19 +111,44 @@ class sprava_uzivatelu extends ds1_base_model
         }
 
         if(!$predchozi_role_existuje) { //pokud neexistuje předchozí role, pak vytvořím nový záznam
-            $item = array();
-            $item["uzivatele_id"] = $uzivatel_id;
-            $item["uzivatele_role_id"] = $role_id;
-            $id = $this->DBInsert(TABLE_UZIVATELE_PRIDELENI_ROLI, $item);
+            foreach ($role_id as $role_jedna) {
+
+                $item = array();
+                $item["uzivatele_id"] = $uzivatel_id;
+                $item["uzivatele_role_id"] = $role_jedna;
+                $this->DBInsert(TABLE_UZIVATELE_PRIDELENI_ROLI, $item);
+            }
         }else{ //předchozí role existuje, jenom updatuji existující záznam
             $item = array();
-            $item["uzivatele_id"] = $uzivatel_id;
-            $item["uzivatele_role_id"] = $role_id;
-            $where_array = array();
-            $where_array[] = array("column" => "uzivatele_id", "value" => $uzivatel_id, "symbol" => "=");
-            $id = $this->DBUpdate(TABLE_UZIVATELE_PRIDELENI_ROLI, $where_array, $item, "limit 1");
+            $item["uzivatele_role_id"] = -1;
+            $this->DBUpdate(TABLE_UZIVATELE_PRIDELENI_ROLI, $where_array, $item, "");
+            $reused_roles = 0;
+
+            foreach ($role_id as $role_jedna) {
+                if ($reused_roles < sizeof($id_role)) {
+                    $item = array();
+                    $item["uzivatele_id"] = $uzivatel_id;
+                    $item["uzivatele_role_id"] = $role_jedna;
+                    $where_array = array();
+                    $where_array[] = array("column" => "uzivatele_id", "value" => $uzivatel_id, "symbol" => "=");
+                    $where_array[] = array("column" => "uzivatele_role_id", "value" => "-1", "symbol" => "=");
+                    $this->DBUpdate(TABLE_UZIVATELE_PRIDELENI_ROLI, $where_array, $item, "limit 1");
+                    $reused_roles++;
+                } else {
+                    $item = array();
+                    $item["uzivatele_id"] = $uzivatel_id;
+                    $item["uzivatele_role_id"] = $role_jedna;
+                    $this->DBInsert(TABLE_UZIVATELE_PRIDELENI_ROLI, $item);
+                }
+            }
+
+//            $item = array();
+//            $item["uzivatele_id"] = $uzivatel_id;
+//            $item["uzivatele_role_id"] = $role_id;
+//            $where_array = array();
+//            $where_array[] = array("column" => "uzivatele_id", "value" => $uzivatel_id, "symbol" => "=");
+//            $id = $this->DBUpdate(TABLE_UZIVATELE_PRIDELENI_ROLI, $where_array, $item, "limit 1");
         }
-        return $id;
     }
 
     /**
@@ -134,6 +164,21 @@ class sprava_uzivatelu extends ds1_base_model
         $id_role = $id_role["id"]; //odstraním pole
 
         return $id_role;
+    }
+
+    /**
+     * Funkce vrátí název role specifikované pomocí id
+     * @param $id_role id role, jejíž název chceme získat
+     * @return název specifikované role
+     */
+    public function getRoleNazevByIdRole($id_role){
+        $where_array = array();
+        $where_array[] = $this->DBHelperGetWhereItem("id", $id_role);
+        $limit_pom = "limit 1";
+        $nazev_role = $this->DBSelectOne(TABLE_UZIVATELSKE_ROLE, "nazev", $where_array, $limit_pom);
+        $nazev_role = $nazev_role["nazev"];
+
+        return $nazev_role;
     }
 
     /**

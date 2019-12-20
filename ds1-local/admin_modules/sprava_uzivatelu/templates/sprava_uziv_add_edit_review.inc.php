@@ -34,23 +34,15 @@
                                     <td>$uzivatel_data[predchozi_role]</td>
                                     </tr>
                                     <tr>
-                                    <td><b>předchozí role - typy dokumentace</b></td>
-                                    <td>$uzivatel_data[predchozi_role_typy]</td>
-                                    </tr>
-                                    <tr>
                                     <td><b>nová role</b></td>
                                     <td>$uzivatel_data[nova_role]</td>
-                                    </tr>
-                                    <tr>
-                                    <td><b>nová role - typy dokumentace</b></td>
-                                    <td>$uzivatel_data[nova_role_typy]</td>
                                     </tr>                                                         
                                 </tr>";
     echo
     "</table>";
     //potřebné věci si uložím do session a načtu v dalším templatu
     $_SESSION["uzivatel_id"] = "$uzivatel_data[id]";
-    $_SESSION["nova_role_id"] = "$uzivatel_data[nova_role_id]";
+    $_SESSION["nove_role_id"] = $uzivatel_data['nove_role_id'];
     ?>
     <div style="text-align: center">
         <a href="<?php echo $url_add_result;?>" class="btn btn-primary btn-bg"><i class="icon-plus"></i> ANO, přidělit novou roli</a>

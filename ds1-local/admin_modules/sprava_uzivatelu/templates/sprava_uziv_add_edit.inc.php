@@ -14,7 +14,7 @@
                                 <tr>
                                     <th class='w-25'>Login uživatele</th>
                                     <td class='w-75'>
-                                        <input type="text" class="form-control" name="zadano[login]" list="vsechny_loginy_uzivatel" value="<?php
+                                        <input type="text" class="form-control" name="zadanyLogin" list="vsechny_loginy_uzivatel" value="<?php
                                         if($uzivatel_jmeno_klik != -1){
                                             echo $uzivatel_jmeno_klik;
                                         }else{
@@ -32,25 +32,22 @@
                                 <tr>
                                     <th class='w-25'>Nová role</th>
                                     <td class='w-75'>
+                                        <select id="selectBox" multiple hidden id="selectbox" name="zadanaRole[]" class="form-control">
+                                            <?php
+                                            foreach($vsechny_role_uzivatele as $role) {
+                                                ?><option id="<?php echo $role["nazev"]?>" value="<?php echo $role["id"]?>" selected="true"><?php echo $role["nazev"]?></option>
+                                            <?php }
+                                            foreach($vsechny_zbyle_role as $role) {
+                                                ?><option id="<?php echo $role["nazev"]?>" value="<?php echo $role["id"]?>"><?php echo $role["nazev"]?></option>
+                                            <?php } ?>
+                                        </select>
 <!--                                        <input type="text" class="form-control" name="zadano[role]" list="vsechny_role" required />-->
 <!--                                        <datalist id="vsechny_role">-->
 
 <!--                                        </datalist>-->
 <!--                                            <div ng-dropdown-multiselect="" options="myDropdownOptions" selected-model="myDropdownModel" extra-settings="myDropdownSettings"></div>-->
                                         <div ng-controller="adminDropdownMultiselect">
-                                        <div ng-dropdown-multiselect="" ng options="[
-                                        <?php
-                                        $first = 1;
-                                        foreach($vsechny_role as $role) {
-                                            if ( $first == 1 ) {
-                                                $first = 0;
-                                            } else {
-                                                ?>,<?php
-                                            }?>
-
-                                                {id:'<?= $role ?>', label:'<?= $role ?>'}
-                                            <?php
-                                            } ?>]" selected-model="[]" extra-settings="myDropdownSettings"></div>
+                                        <div ng-dropdown-multiselect="" options="optionsList" selected-model="selectedOptions" extra-settings="myDropdownSettings" translation-texts="projectText" events="myEvent"></div>
                                         </div>
                                     </td>
                                 </tr>
