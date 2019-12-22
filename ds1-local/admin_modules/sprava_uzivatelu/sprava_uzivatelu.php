@@ -106,6 +106,13 @@ class sprava_uzivatelu extends ds1_base_model
         return $objekty_prideleni;
     }
 
+    public function addNewRole($role_nazev){
+
+        $item = array();
+        $item["nazev"] = $role_nazev;
+        $this -> DBInsert(TABLE_UZIVATELSKE_ROLE, $item);
+    }
+
     public function saveRolePravaToObject($role_id, $objekt_id, $prava) {
 
         $where_array = array();

@@ -4,6 +4,9 @@
             <div class="pull-left">
                 <h3>Úprava typů rolí</h3>
             </div>
+            <div class="pull-right">
+                <a href="<?php echo $url_pridani_role;?>" class="btn btn-primary btn-sm">Přidat roli</a>
+            </div>
         </div>
         <div class="row">
             <div class="col-md-12">

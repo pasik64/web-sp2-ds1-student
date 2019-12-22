@@ -113,10 +113,45 @@ class sprava_uzivatelu_controller extends ds1_base_controller
             $content_params["url_uzivatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_list_all"));
             $content_params["vsechny_role"] = $uzivatelske_role;
             $content_params["role_edit"] = "admin_uprava_role";
+            $content_params["url_pridani_role"] = $this->makeUrlByRoute($this->route, array("action" => "admin_add_role"));
 
             $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_uprava_typu_roli.inc.php", $content_params, true);
 
-        } else if($action == "admin_uprava_role")
+        } else if ($action == "admin_add_role") {
+            if ($prihlaseny_uzivatel_udaje["login"] != "admin")
+            {
+                $admin_url = $this->makeUrlByRoute($this->route, array("action" => "normal_user_no_access"));
+                header("Location: $admin_url");
+                exit();
+            }
+            $content_params["form_submit_url"] = $this->makeUrlByRoute($this->route);
+            $content_params["form_action_save_role"] = "save_role_result";
+            $content_params["url_seznam_roli"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_uprava_typu_roli"));
+            $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_add_role.inc.php", $content_params, true);
+        } else if ($action == "save_role_result") {
+            if ($prihlaseny_uzivatel_udaje["login"] != "admin") {
+                $admin_url = $this->makeUrlByRoute($this->route, array("action" => "normal_user_no_access"));
+                header("Location: $admin_url");
+                exit();
+            }
+
+            $nova_role = $this->loadRequestParam($request, "nova_role", "post", null);
+
+            $role_test = $sprava_uzivatelu -> getRoleIDByNazevRole($nova_role);
+
+            if ($role_test != null) {
+                $content_params["url_add_role"] = $this->makeUrlByRoute($this->route, array("action" => "admin_add_role"));
+                $content_params["url_seznam_roli"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_uprava_typu_roli"));
+                $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_add_role_error.inc.php", $content_params, true);
+            } else {
+                $sprava_uzivatelu -> addNewRole($nova_role);
+                $content_params["url_add_role"] = $this->makeUrlByRoute($this->route, array("action" => "admin_add_role"));
+                $content_params["url_seznam_roli"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_uprava_typu_roli"));
+                $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_add_role_done.inc.php", $content_params, true);
+            }
+
+        }
+        else if($action == "admin_uprava_role")
         {
             if ($prihlaseny_uzivatel_udaje["login"] != "admin")
             {
