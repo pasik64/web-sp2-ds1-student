@@ -97,10 +97,186 @@ class sprava_uzivatelu_controller extends ds1_base_controller
                 $uzivatel_data["role_data"] = $dokumentace_pacient -> getRoleUzivatelByIDUzivatel($uzivatel_data["id"]);
             }*/
             $content_params["uzivatele_info"] = $data_uzivatelu;
-            $content_params["url_pridat_role"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_edit_role")); //odkaz na přidání role
+            $content_params["url_uprava_typu_roli"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_uprava_typu_roli")); //odkaz na přidání role
             $uzivatele = $sprava_uzivatelu -> getVsechnaPrijmeniUzivatele(); //všechna příjmení uživatelů
             $content_params["napoveda_prijmeni_uzivatelu"] = $uzivatele;
             $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_admin_list.inc.php", $content_params, true);
+        } else if($action == "admin_users_uprava_typu_roli")
+        {
+            if ($prihlaseny_uzivatel_udaje["login"] != "admin")
+            {
+                $admin_url = $this->makeUrlByRoute($this->route, array("action" => "normal_user_no_access"));
+                header("Location: $admin_url");
+                exit();
+            }
+            $uzivatelske_role = $sprava_uzivatelu -> getUzivatelskeRole();
+            $content_params["url_uzivatele_list"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_list_all"));
+            $content_params["vsechny_role"] = $uzivatelske_role;
+            $content_params["role_edit"] = "admin_uprava_role";
+
+            $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_uprava_typu_roli.inc.php", $content_params, true);
+
+        } else if($action == "admin_uprava_role")
+        {
+            if ($prihlaseny_uzivatel_udaje["login"] != "admin")
+            {
+                $admin_url = $this->makeUrlByRoute($this->route, array("action" => "normal_user_no_access"));
+                header("Location: $admin_url");
+                exit();
+            }
+            $role_vybrano = $this->loadRequestParam($request, "role", "all", null);
+            $role_prideleni_objektu = $sprava_uzivatelu -> getDbObjektyPrideleniByIdRole($role_vybrano["id"]);
+            $db_objekty = $sprava_uzivatelu -> getDbObjekty();
+
+            $content_params["url_uprava_typu_roli"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_uprava_typu_roli"));
+            $content_params["uprava_role_edit"] = "admin_uprava_role_edit";
+            $content_params["role"] = $role_vybrano;
+            $content_params["role_prideleni_objektu"] = $role_prideleni_objektu;
+            $content_params["db_objekty"] = $db_objekty;
+
+            $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_uprava_role.inc.php", $content_params, true);
+
+        } else if($action == "admin_uprava_role_edit")
+        {
+            if ($prihlaseny_uzivatel_udaje["login"] != "admin") {
+                $admin_url = $this->makeUrlByRoute($this->route, array("action" => "normal_user_no_access"));
+                header("Location: $admin_url");
+                exit();
+            }
+
+            $role = $this->loadRequestParam($request, "role", "all", null);
+            $prideleni = $this->loadRequestParam($request, "prideleni", "all", null);
+            $objekt = $this->loadRequestParam($request, "objekt", "all", null);
+
+            $content_params["url_uprava_role"] = $this->makeUrlByRoute($this->route, array("action" => "admin_uprava_role", "role" => $role));
+            $content_params["uprava_role_edit"] = "admin_uprava_role_edit";
+            $content_params["role"] = $role;
+            $content_params["role_prideleni"] = $prideleni;
+            $content_params["form_submit_url"] = $this->makeUrlByRoute($this->route);
+            $content_params["form_action_save_prava"] = "save_prava_review";
+            $content_params["objekt"] = $objekt;
+
+            $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_uprava_role_edit.inc.php", $content_params, true);
+
+        } else if($action == "save_prava_review")
+        {
+            if ($prihlaseny_uzivatel_udaje["login"] != "admin") {
+                $admin_url = $this->makeUrlByRoute($this->route, array("action" => "normal_user_no_access"));
+                header("Location: $admin_url");
+                exit();
+            }
+
+            $zadana_prava = $this->loadRequestParam($request, "zadanaPrava", "post", null);
+            $role = $this->loadRequestParam($request, "role", "post", null);
+            $objekt = $this->loadRequestParam($request, "objekt", "post", null);
+
+            $role_nazev = $sprava_uzivatelu -> getRoleNazevByIdRole($role);
+            $objekt_nazev = $sprava_uzivatelu -> getObjektNazevByIdObjektu($objekt);
+            $prideleni_soucasne = $sprava_uzivatelu -> getPrideleniPravByIdObjektuAndIdRole($objekt, $role);
+            $prideleni_soucasne_string = "";
+            if ($prideleni_soucasne != null) {
+                if ($prideleni_soucasne["read"] == 1) {
+                    $prideleni_soucasne_string = "read";
+                }
+                if ($prideleni_soucasne["insert"] == 1) {
+                    if ($prideleni_soucasne_string != "") {
+                        $prideleni_soucasne_string = $prideleni_soucasne_string.", insert";
+                    } else {
+                        $prideleni_soucasne_string = "insert";
+                    }
+                }
+                if ($prideleni_soucasne["update"] == 1) {
+                    if ($prideleni_soucasne_string != "") {
+                        $prideleni_soucasne_string = $prideleni_soucasne_string.", update";
+                    } else {
+                        $prideleni_soucasne_string = "update";
+                    }
+                }
+                if ($prideleni_soucasne["delete"] == 1) {
+                    if ($prideleni_soucasne_string != "") {
+                        $prideleni_soucasne_string = $prideleni_soucasne_string.", delete";
+                    } else {
+                        $prideleni_soucasne_string = "delete";
+                    }
+                }
+            }
+            if ($prideleni_soucasne_string == "") {
+                $prideleni_soucasne_string = "žádná";
+            }
+            $prideleni_nove_string = "";
+            if ($zadana_prava != null) {
+                foreach ($zadana_prava as $prava) {
+                    if ($prava == "read") {
+                        $prideleni_nove_string = "read";
+                    }
+                    if ($prava == "insert") {
+                        if ($prideleni_nove_string != "") {
+                            $prideleni_nove_string = $prideleni_nove_string . ", insert";
+                        } else {
+                            $prideleni_nove_string = "insert";
+                        }
+                    }
+                    if ($prava == "update") {
+                        if ($prideleni_nove_string != "") {
+                            $prideleni_nove_string = $prideleni_nove_string . ", update";
+                        } else {
+                            $prideleni_nove_string = "update";
+                        }
+                    }
+                    if ($prava == "delete") {
+                        if ($prideleni_nove_string != "") {
+                            $prideleni_nove_string = $prideleni_nove_string . ", delete";
+                        } else {
+                            $prideleni_nove_string = "delete";
+                        }
+                    }
+                }
+            }
+            if ($prideleni_nove_string == "") {
+                $prideleni_nove_string = "žádné";
+            }
+
+            $content_params["zadana_prava"] = $zadana_prava;
+            $content_params["role_nazev"] = $role_nazev;
+            $content_params["role_id"] = $role;
+            $content_params["objekt_id"] = $objekt;
+            $content_params["objekt_nazev"] = $objekt_nazev;
+            $content_params["prideleni_soucasne"] = $prideleni_soucasne_string;
+            $content_params["prideleni_nove"] = $prideleni_nove_string;
+            $content_params["url_add_result"] = $this->makeUrlByRoute($this->route, array("action" => "role_add_prava_to_objekt"));
+            
+            $role_item = array();
+            $role_item["nazev"] = $sprava_uzivatelu -> getRoleNazevByIdRole($role);
+            $role_item["id"] = $role;
+
+            $objekt_item = array();
+            $objekt_item["nazev"] = $objekt_nazev;
+            $objekt_item["id"] = $objekt;
+            $content_params["url_uprava_role_edit"] = $this->makeUrlByRoute($this->route, array("action" => "admin_uprava_role_edit", "prideleni" => $prideleni_soucasne, "role" => $role_item, "objekt" => $objekt_item));
+
+
+            $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_uprava_role_review.inc.php", $content_params, true);
+
+        } else if($action == "role_add_prava_to_objekt") {
+            if ($prihlaseny_uzivatel_udaje["login"] != "admin") { //pokud není přihlášený admin, tak ho přesměruji
+                $admin_url = $this->makeUrlByRoute($this->route, array("action" => "normal_user_no_access"));
+                header("Location: $admin_url");
+                exit();
+            }
+
+            $zadana_prava = $_SESSION["zadana_prava"];
+            $role_id = $_SESSION["role_id"];
+            $objekt_id = $_SESSION["objekt_id"];
+
+            $role_item = array();
+            $role_item["nazev"] = $sprava_uzivatelu -> getRoleNazevByIdRole($role_id);
+            $role_item["id"] = $role_id;
+
+            $sprava_uzivatelu -> saveRolePravaToObject($role_id, $objekt_id, $zadana_prava);
+            $content_params["role"] = $role_id;
+            $content_params["url_uprava_role"] = $this->makeUrlByRoute($this->route, array("action" => "admin_uprava_role", "role" => $role_item));
+            $content_params["url_uprava_typu_roli"] = $this->makeUrlByRoute($this->route, array("action" => "admin_users_uprava_typu_roli"));
+            $content = $this->renderPhp(DS1_DIR_ADMIN_MODULES_FROM_ADMIN . "sprava_uzivatelu/templates/sprava_uziv_uprava_role_result.inc.php", $content_params, true);
         }
         else if($action == "admin_users_edit_role")
         {
@@ -171,32 +347,33 @@ class sprava_uzivatelu_controller extends ds1_base_controller
             // nacist zadana data
             $login_zadano = $this->loadRequestParam($request, "zadanyLogin", "post", null);
             $role_zadano = $this->loadRequestParam($request, "zadanaRole", "post", null);
-            var_dump($_POST);
 
             //zjistím si, jestli existuje daný uživatel a role
             $uzivatel = $sprava_uzivatelu -> getUzivatelByLogin($login_zadano);
 
             $vsechny_zadane_role = array();
 
-            foreach ($role_zadano as $role){
+            if ($role_zadano != null) {
+                foreach ($role_zadano as $role) {
 
-                if($role == NULL && $uzivatel == NULL){ //pokud neexistuje role ani uživatel
-                    $error_url =  $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
-                    $_SESSION["error_text"] = "CHYBA! V DB není definována zvolená role, ani zvolený uživatel - příště vybírejte z nabízených možností.";
-                    header("Location: $error_url");
-                    exit();
-                }else if($role == NULL){ //pokud neexistuje role
-                    $error_url =  $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
-                    $_SESSION["error_text"] = "CHYBA! V DB není definována zvolená role - příště vybírejte z nabízených možností.";
+                    if ($role == NULL && $uzivatel == NULL) { //pokud neexistuje role ani uživatel
+                        $error_url = $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
+                        $_SESSION["error_text"] = "CHYBA! V DB není definována zvolená role, ani zvolený uživatel - příště vybírejte z nabízených možností.";
+                        header("Location: $error_url");
+                        exit();
+                    } else if ($role == NULL) { //pokud neexistuje role
+                        $error_url = $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
+                        $_SESSION["error_text"] = "CHYBA! V DB není definována zvolená role - příště vybírejte z nabízených možností.";
 //                header("Location: $error_url");
-                    exit();
-                }else if($uzivatel == NULL){ //pokud neexistuje uživatel
-                    $_SESSION["error_text"] = "CHYBA! V DB není definován zvolený uživatel - příště vybírejte z nabízených možností.";
-                    $error_url =  $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
-                    header("Location: $error_url");
-                    exit();
+                        exit();
+                    } else if ($uzivatel == NULL) { //pokud neexistuje uživatel
+                        $_SESSION["error_text"] = "CHYBA! V DB není definován zvolený uživatel - příště vybírejte z nabízených možností.";
+                        $error_url = $this->makeUrlByRoute($this->route, array("action" => "error_admin_prideleni"));
+                        header("Location: $error_url");
+                        exit();
+                    }
+                    array_push($vsechny_zadane_role, $role);
                 }
-                array_push($vsechny_zadane_role, $role);
             }
 
             //načtu si údaj z DB týkající se daného uživatele

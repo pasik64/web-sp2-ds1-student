@@ -23,7 +23,7 @@ class sprava_uzivatelu extends ds1_base_model
 
     public function getUzivatelskeRole() {
         $where_array = array();
-        $rows = $this->DBSelectAll("ds1_uzivatelske_role", "*", $where_array, "", "asc");
+        $rows = $this->DBSelectAll("ds1_uzivatelske_role", "*", $where_array, "", "");
         return $rows;
     }
 
@@ -91,6 +91,106 @@ class sprava_uzivatelu extends ds1_base_model
         return $druhy_zapisu_pristup;
     }
 
+    public function getDbObjektyPrideleniByIdRole($role_id){
+        $where_array = array();
+        $where_array[] = $this->DBHelperGetWhereItem("uzivatelske_role_id", $role_id);
+        $objekty_prideleni = $this->DBSelectAll(TABLE_UZIVATELSKE_ROLE_DB_OBJEKTY, "*", $where_array, "", "");
+
+        return $objekty_prideleni;
+    }
+
+    public function getDbObjekty(){
+        $where_array = array();
+        $objekty_prideleni = $this->DBSelectAll(TABLE_OBJEKTY, "*", $where_array, "", "");
+
+        return $objekty_prideleni;
+    }
+
+    public function saveRolePravaToObject($role_id, $objekt_id, $prava) {
+
+        $where_array = array();
+        $where_array[] = $this->DBHelperGetWhereItem("uzivatelske_role_id", $role_id);
+        $where_array[] = $this->DBHelperGetWhereItem("db_objekty_id", $objekt_id);
+        $prirazeni = $this->DBSelectOne(TABLE_UZIVATELSKE_ROLE_DB_OBJEKTY, "*", $where_array, "limit 1");
+        $item = array();
+        $read_used = false;
+        $insert_used = false;
+        $update_used = false;
+        $delete_used = false;
+        if ($prirazeni != null) {
+            if ($prava != null) {
+                foreach ($prava as $pravo) {
+                    if ($pravo == "read") {
+                        $item["`read`"] = 1;
+                        $read_used = true;
+                    }
+                    if ($pravo == "insert") {
+                        $item["`insert`"] = 1;
+                        $insert_used = true;
+                    }
+                    if ($pravo == "update") {
+                        $item["`update`"] = 1;
+                        $update_used = true;
+                    }
+                    if ($pravo == "delete") {
+                        $item["`delete`"] = 1;
+                        $delete_used = true;
+                    }
+                }
+            }
+            if (!$read_used) {
+                $item["`read`"] = 0;
+            }
+            if (!$insert_used) {
+                $item["`insert`"] = 0;
+            }
+            if (!$update_used) {
+                $item["`update`"] = 0;
+            }
+            if (!$delete_used) {
+                $item["`delete`"] = 0;
+            }
+            $this->DBUpdate(TABLE_UZIVATELSKE_ROLE_DB_OBJEKTY, $where_array, $item, "");
+        } else {
+            if ($prava != null) {
+                foreach ($prava as $pravo) {
+                    if ($pravo == "read") {
+                        $item["read"] = 1;
+                        $read_used = true;
+                    }
+                    if ($pravo == "insert") {
+                        $item["insert"] = 1;
+                        $insert_used = true;
+                    }
+                    if ($pravo == "update") {
+                        $item["update"] = 1;
+                        $update_used = true;
+                    }
+                    if ($pravo == "delete") {
+                        $item["delete"] = 1;
+                        $delete_used = true;
+                    }
+                }
+            }
+            if (!$read_used) {
+                $item["read"] = 0;
+            }
+            if (!$insert_used) {
+                $item["insert"] = 0;
+            }
+            if (!$update_used) {
+                $item["update"] = 0;
+            }
+            if (!$delete_used) {
+                $item["delete"] = 0;
+            }
+            $item["uzivatelske_role_id"] = $role_id;
+            $item["db_objekty_id"] = $objekt_id;
+            $this->DBInsert(TABLE_UZIVATELSKE_ROLE_DB_OBJEKTY, $item);
+        }
+
+    }
+
     /**
      * Funkce přidělí uživateli s předaným id novou roli (také specifikovanou id)
      * @param $uzivatel_id id uživatele, kterému chceme přidat / upravit roli
@@ -141,13 +241,6 @@ class sprava_uzivatelu extends ds1_base_model
                     $this->DBInsert(TABLE_UZIVATELE_PRIDELENI_ROLI, $item);
                 }
             }
-
-//            $item = array();
-//            $item["uzivatele_id"] = $uzivatel_id;
-//            $item["uzivatele_role_id"] = $role_id;
-//            $where_array = array();
-//            $where_array[] = array("column" => "uzivatele_id", "value" => $uzivatel_id, "symbol" => "=");
-//            $id = $this->DBUpdate(TABLE_UZIVATELE_PRIDELENI_ROLI, $where_array, $item, "limit 1");
         }
     }
 
@@ -179,6 +272,31 @@ class sprava_uzivatelu extends ds1_base_model
         $nazev_role = $nazev_role["nazev"];
 
         return $nazev_role;
+    }
+
+    /**
+     * Funkce vrátí název objektu specifikovaného pomocí id
+     * @param $id_objekt id objektu, jehož název chceme získat
+     * @return název specifikovaného objektu
+     */
+    public function getObjektNazevByIdObjektu($id_objekt){
+        $where_array = array();
+        $where_array[] = $this->DBHelperGetWhereItem("id", $id_objekt);
+        $limit_pom = "limit 1";
+        $nazev_objektu = $this->DBSelectOne(TABLE_OBJEKTY, "nazev", $where_array, $limit_pom);
+        $nazev_objektu = $nazev_objektu["nazev"];
+
+        return $nazev_objektu;
+    }
+
+    public function getPrideleniPravByIdObjektuAndIdRole($id_objekt, $id_role){
+        $where_array = array();
+        $where_array[] = $this->DBHelperGetWhereItem("db_objekty_id", $id_objekt);
+        $where_array[] = $this->DBHelperGetWhereItem("uzivatelske_role_id", $id_role);
+        $limit_pom = "limit 1";
+        $prideleni = $this->DBSelectOne(TABLE_UZIVATELSKE_ROLE_DB_OBJEKTY, "*", $where_array, $limit_pom);
+
+        return $prideleni;
     }
 
     /**

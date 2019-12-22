@@ -87,6 +87,8 @@
 
         // dodatky pro modul dokumentace
         define("TABLE_DOKUMENTACE", TABLE_PREFIX."dokumentace");
+        define("TABLE_OBJEKTY", TABLE_PREFIX."objekty");
+        define("TABLE_UZIVATELSKE_ROLE_DB_OBJEKTY", TABLE_PREFIX."uzivatelske_role_db_objekty");
         define("TABLE_DOKUMENTACE_DRUH_ZAPISU", TABLE_PREFIX."dokumentace_druh_zapisu");
         define("TABLE_DRUH_ZAPISU_UZIVATELSKE_ROLE", TABLE_PREFIX."druh_zapisu_uzivatelske_role");
         define("TABLE_UZIVATELSKE_ROLE", TABLE_PREFIX."uzivatelske_role");

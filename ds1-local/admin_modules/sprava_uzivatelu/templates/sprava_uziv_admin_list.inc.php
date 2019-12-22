@@ -17,7 +17,7 @@
             </div>
             <div class="pull-right">
                 <!-- odkaz pro pridani dokumentace -->
-                <a href="<?php echo $url_pridat_role;?>" class="btn btn-primary btn-sm"><i class="icon-plus"></i> Přidělit / upravit roli</a>
+                <a href="<?php echo $url_uprava_typu_roli;?>" class="btn btn-primary btn-sm">Úprava typů rolí</a>
             </div>
         </div>
         <div class="row">
