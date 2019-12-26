@@ -21,6 +21,10 @@ class sprava_uzivatelu extends ds1_base_model
         return $uzivatel_data;
     }
 
+    /**
+     * Funkce vrátí všechny uživatelské role uložené v databázi
+     * @return array
+     */
     public function getUzivatelskeRole() {
         $where_array = array();
         $rows = $this->DBSelectAll("ds1_uzivatelske_role", "*", $where_array, "", "");
@@ -28,7 +32,7 @@ class sprava_uzivatelu extends ds1_base_model
     }
 
     /**
-     * Metoda vrátí z DB řádek obsahující informace o rolích požadovaného uživatele
+     * Funkce vrátí z DB řádek obsahující informace o rolích požadovaného uživatele
      * @param $id_uzivatel id požadovaného uživatele v tabulce uživatelů
      * @return mixed řádek z DB obsahující informace o roli požadovaného uživatele
      */
@@ -62,7 +66,7 @@ class sprava_uzivatelu extends ds1_base_model
     }
 
     /**
-     * Metoda vrátí z DB řádky obsahující informace o typech dokumentace, ke kterým má přístup role s požadovaným názvem
+     * Funkce vrátí z DB řádky obsahující informace o typech dokumentace, ke kterým má přístup role s požadovaným názvem
      * @param $role_nazev název role, o níž chci informace zjistit
      * @return array řádky DB obsahující informace o typech dokumentace, ke kterým má přístup role s požadovaným názvem
      */
@@ -91,6 +95,11 @@ class sprava_uzivatelu extends ds1_base_model
         return $druhy_zapisu_pristup;
     }
 
+    /**
+     * Funkce vrátí z DB řádky obsahující informace o přístupech k objektům podle id role
+     * @param $role_id id role, o níž chci informace zjistit
+     * @return array řádky DB obsahující informace o přístupech k objektům, ke kterým má role přístup
+     */
     public function getDbObjektyPrideleniByIdRole($role_id){
         $where_array = array();
         $where_array[] = $this->DBHelperGetWhereItem("uzivatelske_role_id", $role_id);
@@ -99,6 +108,10 @@ class sprava_uzivatelu extends ds1_base_model
         return $objekty_prideleni;
     }
 
+    /**
+     * Funkce vrátí z DB všechny objekty
+     * @return array všdchny objekty uložené v databázi
+     */
     public function getDbObjekty(){
         $where_array = array();
         $objekty_prideleni = $this->DBSelectAll(TABLE_OBJEKTY, "*", $where_array, "", "");
@@ -106,13 +119,22 @@ class sprava_uzivatelu extends ds1_base_model
         return $objekty_prideleni;
     }
 
+    /**
+     * Funkce přidá do databáze roli s předaným názvem
+     * @param $role_nazev název role, která se přidává do databáze
+     */
     public function addNewRole($role_nazev){
-
         $item = array();
         $item["nazev"] = $role_nazev;
         $this -> DBInsert(TABLE_UZIVATELSKE_ROLE, $item);
     }
 
+    /**
+     * Funkce přidá do databáze práva role k danému objektu
+     * @param $role_id ID role, které se vkládají práva k objektu
+     * @param $objekt_id ID objektu, ke kteréme se přidávají práva
+     * @param $prava zadaná práva k danému objektu
+     */
     public function saveRolePravaToObject($role_id, $objekt_id, $prava) {
 
         $where_array = array();
@@ -296,6 +318,12 @@ class sprava_uzivatelu extends ds1_base_model
         return $nazev_objektu;
     }
 
+    /**
+     * Funkce přidělení práv role k danému objektu
+     * @param $id_objekt id objektu, k němuž chceme zjistit práva
+     * @param $id_role id role, jejíž práva k danému objektu chceme zjistit
+     * @return $prideleni přidělení práv role k danému objektu
+     */
     public function getPrideleniPravByIdObjektuAndIdRole($id_objekt, $id_role){
         $where_array = array();
         $where_array[] = $this->DBHelperGetWhereItem("db_objekty_id", $id_objekt);
