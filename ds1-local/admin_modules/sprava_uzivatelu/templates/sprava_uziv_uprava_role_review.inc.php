@@ -30,7 +30,7 @@
     $_SESSION["objekt_id"] = $objekt_id;
     ?>
     <div style="text-align: center">
-        <a href="<?php echo $url_add_result;?>" class="btn btn-primary btn-bg"><i class="icon-plus"></i> ANO, přidělit novou roli</a>
+        <a href="<?php echo $url_add_result;?>" class="btn btn-primary btn-bg"><i class="icon-plus"></i> ANO, upravit práva</a>
         <a href="<?php echo $url_uprava_role_edit;?>" class="btn btn-primary btn-bg"><i class="icon-minus"></i> NE, zrušit akci a vrátit se zpět</a>
     </div>
 </div>
